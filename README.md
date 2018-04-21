@@ -13,7 +13,7 @@ git@github.com:none2serious/proc-biopac-coins.git
 ```
 or just download directly:
 
-![Just Download](/Users/stan/Code/adriacq/proc-biopac/download.png)
+![Just Download](https://github.com/none2serious/proc-biopac-coins/blob/master/download.png)
 
 #### Installation
 Copy the proc_biopac.py and physio_libs.py files into the same folder somewhere in your path. I think that you have been putting it in the project directory, but it could go anywhere so long as the two files are in the same folder.
