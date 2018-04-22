@@ -32,26 +32,6 @@ class PhysData():
         self.rr_idx = np.nan
         self.name = ""
 
-def get_channels(acq):
-    trig = np.nan
-    pulse = np.nan
-    resp = np.nan
-    pulse_str = u'PPG100C'
-    trigger_str = u'Digital input'
-    resp_str = u'Custom, DA100C'
-    for k in range(len(acq.channels)):
-        cname = acq.channels[k].name
-        if cname == "TRIGGER" or cname == trigger_str:
-            trig = acq.channels[k].data
-        elif cname == "PULSE" or cname == pulse_str:
-            pulse = acq.channels[k].data
-        elif cname == "RESP" or cname == resp_str:
-            resp = acq.channels[k].data
-    idx = np.where(trig)
-    pulse = pulse[idx]
-    resp = resp[idx]
-    return(pulse, resp)
-
 class PhysioObject():
     def __init__(self):
         self.subid = ""
@@ -93,7 +73,7 @@ class PhysioObject():
             if path.isfile(taskfile):
                 print("loading: %s"%taskfile)
                 data = br.read_file(taskfile)
-                pulse, resp = get_channels(data)
+                pulse, resp = self.get_channels(data)
                 self.run[task].resp = resp
                 self.run[task].pulse= pulse
                 print("Processing: %s, %s"%(self.subid, task))
@@ -144,7 +124,7 @@ def plot_subject_struct(physio_data, output_dir='~/'):
                 ax.plot(dat)
                 ax.plot(ticdat,'r-')
                 ax.set_title(tasklist[k]+", Pulse="+str(rate))
-            except:
+            except IndexError:
                 ax.set_title(tasklist[k]+", Pulse=Unknown")
                 ax.text(0.25,0.4, "ERROR OCCURRED DURING PROCESSING")
         else:
