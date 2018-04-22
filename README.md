@@ -9,7 +9,7 @@ Also creates some basic QA and summary stats. The main feature of this version i
 
 You can clone from git
 ```
-git@github.com:none2serious/proc-biopac-coins.git
+git clone git@github.com:none2serious/proc-biopac-coins.git
 ```
 or just download directly:
 
