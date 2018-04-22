@@ -152,18 +152,21 @@ def plot_subject_struct(physio_data, output_dir='~/'):
     outfile = os.path.join(output_dir,figname)
     fig.savefig(outfile)
 
-def save_physio_csv(physio_data, output_dir, tasklist):
+def save_physio_csv(physio_data, output_dir):
     output_csv = os.path.join(output_dir, 'physio_values.csv')
     if os.path.isfile(output_csv) is False:
         hdrstr = "subject_id"
-        for task in tasklist:
+        for task in physio_data.tasklist:
             hdrstr = hdrstr+','+task+'_hr,'+task+'_rr'
         csv_out = open(output_csv, 'w')
         csv_out.write(hdrstr+'\n')
         csv_out.close()
-    outstr = physio_data['subject_id']
-    for task in tasklist:
-        outstr = outstr+','+str(physio_data[task][0]) + ',' + str(physio_data[task][3])
+    outstr = physio_data.subid
+    for task in physio_data.tasklist:
+        outstr = outstr+','+str(physio_data.run[task].hr) + ',' + str(physio_data.run[task].rr)
+    csv_out = open(output_csv, 'a')
+    csv_out.write(outstr+'\n')
+    csv_out.close()
 
 def save_physio_tsv(physio_data, output_dir):
     tasklist = physio_data.tasklist

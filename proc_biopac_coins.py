@@ -40,6 +40,7 @@ for sub in sublist:
     qa_dir = os.path.join(source_dir, sub,'QC','physio')
     plot_subject_struct(physio, qa_dir)
     physio_out = os.path.join(source_dir,"BIDS")
+    save_physio_csv(physio, source_dir)
     save_physio_tsv(physio, physio_out)
     print('')
     
