@@ -15,7 +15,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-
+import pandas as pd
 
 def moving_average(a, n=3) :
     ret = np.cumsum(a, dtype=float)
@@ -154,19 +154,17 @@ def plot_subject_struct(physio_data, output_dir='~/'):
 
 def save_physio_csv(physio_data, output_dir):
     output_csv = os.path.join(output_dir, 'physio_values.csv')
-    if os.path.isfile(output_csv) is False:
-        hdrstr = "subject_id"
-        for task in physio_data.tasklist:
-            hdrstr = hdrstr+','+task+'_hr,'+task+'_rr'
-        csv_out = open(output_csv, 'w')
-        csv_out.write(hdrstr+'\n')
-        csv_out.close()
-    outstr = physio_data.subid
+    odat = {}
+    odat["subject_id"] = physio_data.subid
     for task in physio_data.tasklist:
-        outstr = outstr+','+str(physio_data.run[task].hr) + ',' + str(physio_data.run[task].rr)
-    csv_out = open(output_csv, 'a')
-    csv_out.write(outstr+'\n')
-    csv_out.close()
+        odat[task+'_hr'] = physio_data.run[task].hr
+        odat[task+'_rr'] = physio_data.run[task].rr
+    df = pd.DataFrame([odat])
+    if os.path.isfile(output_csv) is True:
+        indf = pd.read_csv(output_csv)
+        df = df.append(indf)
+    print('Writing hr/rr to: %s'%output_csv)
+    df.to_csv(output_csv, index=False)
 
 def save_physio_tsv(physio_data, output_dir):
     tasklist = physio_data.tasklist
