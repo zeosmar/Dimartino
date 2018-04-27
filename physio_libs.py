@@ -16,7 +16,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import pandas as pd
-
+import datetime
 def moving_average(a, n=3) :
     ret = np.cumsum(a, dtype=float)
     ret[n:] = ret[n:] - ret[:-n]
@@ -35,6 +35,7 @@ class PhysData():
 class PhysioObject():
     def __init__(self):
         self.subid = ""
+        self.project_directory = ""
         self.tasklist = ['face1', 'face2', 'rest1', 'rest2']
         self.target_sampling_rate = 50
         self.natve_sampling_rate = np.nan
@@ -43,6 +44,18 @@ class PhysioObject():
         for task in self.tasklist:
             self.run[task] = PhysData()
 
+    def write_to_missing(self, filepath, taskname):
+        logpath = path.join(self.project_directory, "missing_physio_runs.csv")
+        if path.exists(logpath) is False:
+            f = open(logpath, 'w')
+            f.write('subject,fmri,date_time,coins_path\n')
+            f.close()
+        datestr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        outstr = "%s,%s,%s,%s\n"%(self.subid, taskname, datestr, filepath)
+        f = open(logpath, 'a')
+        f.write(outstr)
+        f.close()
+            
     @staticmethod
     def get_channels(acq):
         trig = np.nan
@@ -89,7 +102,10 @@ class PhysioObject():
                 self.run[task].rr_idx = signal.find_peaks_cwt(moving_average(self.run[task].resp,50), np.arange(1,70))
                 self.run[task].rr = int(len(self.run[task].rr_idx) / ((len(self.run[task].resp)/self.target_sampling_rate)/60.0))
             else:
-                print("No acq file found for: %s, %s" % (self.subid, task))                
+                ostr = """--------------\nWarning!\n  %s does not exist.\n  No physio TSV file will be created for %s, %s.\n--------------"""
+#                print("No acq file found for: %s, %s" % (self.subid, task))    
+                print(ostr%(taskfile, self.subid, task))
+                self.write_to_missing(taskfile, task)
         self.hasloaded = True
 
 def lfr(X, order = 3, cutoff_freq = 0.01):
