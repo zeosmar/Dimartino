@@ -63,7 +63,8 @@ if args.temp_json:
 
 listRow=runsheet.iloc[0,:]
 
-#json_path="/home/sray/Desktop/physio/physio-template.json"
+if not os.path.exists(input_dir+"physio_templates"):
+    os.mkdir(input_dir+"physio_templates")
 
 with open(json_path) as json_file:
     json_file=json.load(json_file)
@@ -121,17 +122,17 @@ for sub in range(1,len(runsheet)):
     for j in range(4):
         if subdata[1][j].find('Face1')!=-1:
             df.iloc[0,2]=subdata[1][j]
-            json_file["face1"]=unicode(input_dir+"sub-"+runsheet["Scan_scanID"][sub]+"/originals/01+physio/sub-"+runsheet["Scan_scanID"][1]+"_"+subdata[1][j].lower()+".acq")
+            json_file["face1"]=unicode(input_dir+"sub-"+runsheet["Scan_scanID"][sub]+"/originals/01+physio/sub-"+runsheet["Scan_scanID"][sub]+"_"+subdata[1][j].lower()+".acq")
         elif subdata[1][j].find('Face2')!=-1:
             df.iloc[0,3]=subdata[1][j]
-            json_file["face2"]=unicode(input_dir+"sub-"+runsheet["Scan_scanID"][sub]+"/originals/01+physio/sub-"+runsheet["Scan_scanID"][1]+"_"+subdata[1][j].lower()+".acq")
+            json_file["face2"]=unicode(input_dir+"sub-"+runsheet["Scan_scanID"][sub]+"/originals/01+physio/sub-"+runsheet["Scan_scanID"][sub]+"_"+subdata[1][j].lower()+".acq")
         elif subdata[1][j].find('Rest1')!=-1:
             df.iloc[0,0]=subdata[1][j]
-            json_file["rest1"]=unicode(input_dir+"sub-"+runsheet["Scan_scanID"][sub]+"/originals/01+physio/sub-"+runsheet["Scan_scanID"][1]+"_"+subdata[1][j].lower()+".acq")
+            json_file["rest1"]=unicode(input_dir+"sub-"+runsheet["Scan_scanID"][sub]+"/originals/01+physio/sub-"+runsheet["Scan_scanID"][sub]+"_"+subdata[1][j].lower()+".acq")
         elif subdata[1][j].find('Rest2')!=-1:
             df.iloc[0,1]=subdata[1][j]
-            json_file["rest2"]=unicode(input_dir+"sub-"+runsheet["Scan_scanID"][sub]+"/originals/01+physio/sub-"+runsheet["Scan_scanID"][1]+"_"+subdata[1][j].lower()+".acq")
+            json_file["rest2"]=unicode(input_dir+"sub-"+runsheet["Scan_scanID"][sub]+"/originals/01+physio/sub-"+runsheet["Scan_scanID"][sub]+"_"+subdata[1][j].lower()+".acq")
     
-    with open(input_dir+"sub-"+runsheet["Scan_scanID"][sub]+"/originals/01+physio/"+runsheet["Scan_scanID"][sub]+".json","w") as fp:
+    with open(input_dir+"physio_templates/sub-"+runsheet["Scan_scanID"][sub]+"_physio-template.json","w") as fp:
         json.dump(json_file,fp)
     
