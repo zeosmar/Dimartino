@@ -44,25 +44,4 @@ for sub in sublist:
     save_physio_csv(physio, project_dir)
     save_physio_tsv(physio, physio_out)
     print('')
-
-#source_dir = path.abspath(path.expanduser(args.project_directory))
-#if args.template_directory == "physio_templates":
-#    template_dir = path.join(source_dir,"physio_templates")
-#else:
-#    template_dir = path.abspath(path.expanduser(source_dir))
-#    
-#sublist = [fil.strip() for fil in open(args.subject_list)]
-#
-#for sub in sublist:
-#    print(sub.upper().strip())
-#    physio = PhysioObject()
-#    physio.subid = sub.strip()
-#    physio.project_directory = source_dir
-#    sub_template = path.join(template_dir, "%s_physio-template.json"%sub)
-#    physio.load_from_template(sub_template)
-#    qa_dir = os.path.join(source_dir, sub,'QC','physio')
-#    plot_subject_struct(physio, qa_dir)
-#    physio_out = os.path.join(source_dir,"BIDS")
-#    save_physio_csv(physio, source_dir)
-#    save_physio_tsv(physio, physio_out)
-#    print('')
+    
