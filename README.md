@@ -13,5 +13,5 @@ COINS_physio.py --runsheet="/home/sray/Desktop/physio/COINS_run_sheet_output.csv
 
 
 runsheet= path to the COINS runsheet .csv file
-input_dir= input directory to the subject files. The final putput is stored in physio directory with the subID.json extension
+input_dir= input directory to the subject files. The final output is stored in physio directory with the subID.json extension
 temp_json= path to the template .json file
