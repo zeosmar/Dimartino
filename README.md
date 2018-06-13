@@ -8,7 +8,7 @@ syntax -
 
 
 
-COINS2physio.py --runsheet="/home/sray/Desktop/physio/COINS_run_sheet_output.csv" --input_dir="/home/sray/Desktop/physio/" --temp_json="/home/sray/Desktop/physio/physio-template.json"
+COINS_physio.py --runsheet="/home/sray/Desktop/physio/COINS_run_sheet_output.csv" --input_dir="/home/sray/Desktop/physio/" --temp_json="/home/sray/Desktop/physio/physio-template.json"
 
 
 
