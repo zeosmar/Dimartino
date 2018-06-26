@@ -10,7 +10,6 @@ import os, sys
 import pandas as pd
 import numpy as np
 import json
-from optparse import OptionParser
 import argparse
 
 #Take input form user
@@ -27,8 +26,8 @@ def gracefulExit():
 basePath=os.getcwd()
 
 parser=MyParser(prog="COINS_physio")
-parser.add_argument("-rs","--runsheet",dest="runsheet")
-parser.add_argument("-idir","--input_dir",dest="input_dir")
+parser.add_argument("-rs","--runsheet",dest="runsheet",required=True)
+parser.add_argument("-idir","--input_dir",dest="input_dir",required=True)
 parser.add_argument("-tj","--temp_json",dest="temp_json")
 
 
@@ -47,8 +46,7 @@ if args.runsheet:
     
     fullpathr=os.path.join(headr,tailr)
     runsheet=pd.read_csv(fullpathr)
-else:
-    runsheet=pd.read_csv('/home/sray/Desktop/physio/COINS_run_sheet_output.csv')
+
 
 if args.input_dir:
     input_dir=args.input_dir
@@ -59,6 +57,8 @@ if args.temp_json:
         headj=basePath
     fullpathj=os.path.join(headj,tailj)    
     json_path=fullpathj
+else:
+	json_path=os.path.join(input_dir,"physio-template.json")
     
 
 listRow=runsheet.iloc[0,:]
