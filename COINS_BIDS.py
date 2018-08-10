@@ -46,8 +46,6 @@ if args.runsheet:
     
     fullpathr=os.path.join(headr,tailr)
     runsheet=pd.read_csv(fullpathr)
-else:
-    runsheet=pd.read_csv('/home/sray/Desktop/Desktop/COINS_run_sheet_export.csv')
 
 if args.keysheet:
     headk, tailk=os.path.split(args.keysheet)
@@ -56,8 +54,6 @@ if args.keysheet:
     
     fullpathk=os.path.join(headk,tailk)
     keysheet=pd.read_csv(fullpathk)
-else:
-    keysheet=pd.read_csv('/home/sray/Desktop/Desktop/COINS_run_sheet_key.csv')
     
 if args.output:
     heado, tailo=os.path.split(args.output)
@@ -66,9 +62,6 @@ if args.output:
     
     fullpatho=os.path.join(heado,tailo)
     output_file=fullpatho
-else:
-    output_file="/home/sray/Desktop/Desktop/check2/COINS_BIDS.csv"
-    
 
 
 #Get the first row for getting the Scan name columsn later        
