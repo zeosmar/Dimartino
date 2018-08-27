@@ -10,6 +10,10 @@ or
 
 COINS_BIDS.py --runsheet (input runsheet name with path {path not required if runsheet present in current directory}) --keysheet (input keysheet name with path {path not required if keysheet present in current directory}) --output (input output file name with path {path not required if output is to be saved in current directory})
 
+coins2bids.py - Generate the .json config files for dcm2bids 
+
+coins2bids.py --COINS_BIDS (path to the -op (output) file generated form the COINS_BIDS.py code) --temp_json (path to the config_new2.json file template saved on your desktop) --input_dir (source directory with the subject files)
+
 batch_dcm2bids.py - Organize the data into BIDS format.
 
 syntax - 
