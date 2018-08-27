@@ -1,0 +1,101 @@
+{
+    "descriptions": [
+        {
+            "dataType": "anat",
+            "modalityLabel": "T1w",
+            "criteria": {
+                "SeriesDescription": "ABCD_T1w_MPR",
+				"SeriesNumber": "SNum"
+		}
+        },
+        {
+            "dataType": "anat",
+            "modalityLabel": "T2w",
+            "criteria": {
+                "SeriesDescription": "ABCD_T2w_SPC",
+				"SeriesNumber": "SNum"
+		}
+        },
+        {
+            "dataType": "dwi",
+            "modalityLabel": "dwi",
+	    "customLabels": "dir-AP",
+            "criteria": {
+                "SeriesDescription": "DIFF_137_AP",
+				"SeriesNumber": "SNum"
+            }
+        },
+        {
+	    "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-rest",
+            "criteria": {
+                "SeriesDescription": "REST1",
+				"SeriesNumber": "SNum"
+            }
+        },
+        {
+	    "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-rest",
+            "criteria": {
+                "SeriesDescription": "REST2",
+				"SeriesNumber": "SNum"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-faces",
+            "criteria": {
+                "SeriesDescription": "FACES1",
+				"SeriesNumber": "SNum"
+            }
+        }, 
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-faces",
+            "criteria": {
+                "SeriesDescription": "FACES2",
+				"SeriesNumber": "SNum"
+            }
+        },       
+      	{
+            "dataType": "fmap",
+            "modalityLabel": "magnitude",
+            "customLabels": "acq-FMRI_dir-AP",
+            "criteria": {
+                "SeriesDescription": "FMRI_DISTORTION_AP",
+				"SeriesNumber": "SNum"
+            }
+        },
+	{
+            "dataType": "fmap",
+            "modalityLabel": "magnitude",
+            "customLabels": "acq-FMRI_dir-PA",
+            "criteria": {
+                "SeriesDescription": "FMRI_DISTORTION_PA",
+				"SeriesNumber": "SNum"
+            }
+        },
+	{
+            "dataType": "fmap",
+            "modalityLabel": "magnitude",
+            "customLabels": "acq-SpinEcho_dir-AP",
+            "criteria": {
+                "SeriesDescription": "SpinEcho_Distortion_AP",
+				"SeriesNumber": "SNum"
+            }
+        },
+	{
+            "dataType": "fmap",
+            "modalityLabel": "magnitude",
+            "customLabels": "acq-SpinEcho_dir-PA",
+            "criteria": {
+                "SeriesDescription": "SpinEcho_Distortion_PA",
+				"SeriesNumber": "SNum"
+            }
+        }
+    ]
+}

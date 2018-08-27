@@ -46,7 +46,7 @@ if args.COINS_BIDS:
     fnamer,extr=os.path.splitext(tailr)
     COINS_BIDS=pd.read_csv(fullpathr)
 else:
-    COINS_BIDS=pd.read_csv("/home/sray/Desktop/Desktop/check2/COINS_BIDS.csv")
+    COINS_BIDS=pd.read_csv("/home/sray/Desktop/physio/coins_bids.csv")
     
 COINS_dcm2bids=COINS_BIDS
 
@@ -58,7 +58,7 @@ if args.temp_json:
     fnamek,extk=os.path.splitext(tailk)
     temp_json=fullpathk
 else:
-    temp_json='/home/sray/Desktop/config_new2.json'
+    temp_json='/home/sray/Desktop/physio/config_new2.json'
     
 if args.input_path:
     heado, tailo=os.path.split(args.input_path)
@@ -214,7 +214,7 @@ for j in range(len(COINS_dcm2bids)):
     
     change=len(lines)-3
     lines[change]="        }"
-    f1=open(input_path+"/sub-"+str(COINS_dcm2bids.iloc[j,1])+"/"+str(COINS_dcm2bids.iloc[j,1]+".json"),"w")
+    f1=open(os.path.join(input_path,"sub-"+str(COINS_dcm2bids.iloc[j,1]),str(COINS_dcm2bids.iloc[j,1])+".json"),"w")
     for item in lines:
         f1.write(item)
     f1.close()
