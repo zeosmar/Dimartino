@@ -1,0 +1,13 @@
+Scan Name Key,,,,,Use?,,,Physio Use?,
+1,AAHead_scout,,,,0,No,,0,No
+2,ABCD_T1w_MPR,,,,1,Yes ,,1,Yes 
+3,FMRI_DISTORTION_AP,,,,,,,,
+4,FMRI_DISTORTION_PA,,,,,,,,
+5,Rest1,,,,,,,,
+6,Faces1,,,,,,,,
+7,Faces2,,,,,,,,
+8,Rest2,,,,,,,,
+9,ABCD_T2w_SPC,,,,,,,,
+10,SpinEcho_Distortion_AP,,,,,,,,
+11,SpinEcho_Distortion_PA,,,,,,,,
+12,DIFF_137_AP,,,,,,,,
