@@ -141,7 +141,8 @@ for sub in range(1,len(runsheet)):
     df = pd.DataFrame(subdata)
     df2=df.transpose()
     df3=pd.merge(left=df1,right=df2,left_on="Scan Name Key",right_on=1,how='outer')
-    df3[0]=df3[0].str[:-10].astype(str)
+    df3[0]=df3[0][:-10].astype(str)
+    #df3[0]=df3[0].str[:-10].astype(str)
     df3["Scan Name"]=0
     df3["Scan Name"]=df3[0]+"+"+df3["Unnamed: 1"]
     df3=df3.dropna()
