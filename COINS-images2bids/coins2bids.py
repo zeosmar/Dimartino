@@ -214,10 +214,13 @@ for j in range(len(COINS_dcm2bids)):
     
     change=len(lines)-3
     lines[change]="        }"
-    f1=open(os.path.join(input_path,"sub-"+str(COINS_dcm2bids.iloc[j,1]),str(COINS_dcm2bids.iloc[j,1])+".json"),"w")
-    for item in lines:
-        f1.write(item)
-    f1.close()
+    try:
+        f1=open(os.path.join(input_path,"sub-"+str(COINS_dcm2bids.iloc[j,1]),str(COINS_dcm2bids.iloc[j,1])+".json"),"w")
+        for item in lines:
+            f1.write(item)
+        f1.close()
+    except IOError:
+        pass
         
     
             
