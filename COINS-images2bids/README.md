@@ -14,7 +14,7 @@ COINS_run_sheet_key.csv ---> Example keysheet used for the COINS runsheet to inp
 
 coins2bids.py - Generate the .json config files for dcm2bids 
 
-coins2bids.py --COINS_BIDS (path to the -op (output) file generated form the COINS_BIDS.py code) --temp_json (path to the config_new2.json file template saved on your desktop) --input_dir (source directory with the subject files)
+coins2bids.py --COINS_BIDS (path to the -op (output) file generated form the COINS_BIDS.py code) --temp_json (path to the config_new2.json file template saved on your desktop) --input_path (source directory with the subject files)
 
 batch_dcm2bids.py - Organize the data into BIDS format.
 
