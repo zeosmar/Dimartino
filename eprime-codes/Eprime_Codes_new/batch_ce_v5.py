@@ -75,19 +75,23 @@ elif args.path:
     for f in open("eprime_subject_list.txt"):
         f=f.strip("\n")
         txtpath=direc+"/"+f+"/originals/01+ePrimeData"
-        os.chdir(txtpath)
-        cmd2="ls | grep run1.txt > eprime_txt_list.txt" ######## Can modify according to naming convention of .txt file !!! ####################
-        os.system(cmd2)
-        for f1 in open("eprime_txt_list.txt"):
-            f1=f1.strip("\n")
-            fname,ext=os.path.splitext(f1)
-            fname_2=fname[:-13] ######## Can modify according to naming convention of .txt file !!! ####################
-            file_name=fname_2[:-6] ######## Can modify according to naming convention of .txt file !!! ####################
-            out_file=direc +"/"+ "sub-"+file_name+"/eprime_csvfiles/sub-"+fname_2+".csv" ######## Subject folders must start with a sub- , can modify !!! ####################
-            txtfile=direc+"/"+f+"/originals/01+ePrimeData/"+f1
-            if not os.path.exists(direc +"/"+ "sub-"+file_name+"/eprime_csvfiles"): ######## Subject folders must start with a sub- , can modify !!!
-                os.makedirs(direc +"/"+ "sub-"+file_name+"/eprime_csvfiles") ######## Subject folders must start with a sub- , can modify !!!
-            ce.text_to_csv(f1, out_file)
+        try:
+            os.chdir(txtpath)
+            cmd2="ls | grep run1.txt > eprime_txt_list.txt" ######## Can modify according to naming convention of .txt file !!! ####################
+            os.system(cmd2)
+            for f1 in open("eprime_txt_list.txt"):
+                f1=f1.strip("\n")
+                fname,ext=os.path.splitext(f1)
+                fname_2=fname[:-13] ######## Can modify according to naming convention of .txt file !!! ####################
+                file_name=fname_2[:-6] ######## Can modify according to naming convention of .txt file !!! ####################
+                out_file=direc +"/"+ f+"/eprime_csvfiles/"+fname_2+".csv" ######## Subject folders must start with a sub- , can modify !!! ####################
+                #out_file=direc +"/"+ "sub-"+file_name+"/eprime_csvfiles/sub-"+fname_2+".csv" ######## Subject folders must start with a sub- , can modify !!! ####################
+                txtfile=direc+"/"+f+"/originals/01+ePrimeData/"+f1
+                if not os.path.exists(direc +"/"+ f+"/eprime_csvfiles"): ######## Subject folders must start with a sub- , can modify !!!
+                    os.makedirs(direc +"/"+ f+"/eprime_csvfiles") ######## Subject folders must start with a sub- , can modify !!!
+                ce.text_to_csv(f1, out_file)
+        except:
+            print('Error: could not find eprime data folder in diicom structure') #change this so outputs list of errors to an error file
         
         
         
