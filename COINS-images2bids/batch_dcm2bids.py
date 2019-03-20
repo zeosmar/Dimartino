@@ -60,6 +60,10 @@ if args.COINS_BIDS:
     
 subID=pd.DataFrame(coins_bids.iloc[:,1])
 
-for i in range(len(subID)):    
-    cmd="/usr/local/Anaconda2/bin/dcm2bids -d " + fullpaths + "/sub-" + str(subID["subID"][i]) + " -p " + str(subID["subID"][i]) + " -c " + fullpaths + "/sub-"+ str(subID["subID"][i]) + "/" + str(subID["subID"][i]) + ".json" + " -o " + fullpathd
-    os.system(cmd)
+for i in range(len(subID)):  
+     #cmd="/usr/local/Anaconda2/bin/dcm2bids -d " + fullpaths + "/sub-" + str(subID["subID"][i]) + " -p " + str(subID["subID"][i]) + " -c " + fullpaths + "/sub-"+ str(subID["subID"][i]) + "/" + str(subID["subID"][i]) + ".json" + " -o " + fullpathd
+    try:
+        cmd="dcm2bids -d " + fullpaths + "/sub-" + str(subID["subID"][i]) + " -p " + str(subID["subID"][i]) + " -c " + fullpaths + "/sub-"+ str(subID["subID"][i]) + "/" + str(subID["subID"][i]) + ".json" + " -o " + fullpathd
+        os.system(cmd)
+    except IOError:
+        print('Subject not in folder') #change to output error record to file
