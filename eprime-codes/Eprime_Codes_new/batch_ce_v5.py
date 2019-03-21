@@ -49,8 +49,8 @@ if args.subjectID:
         face1=ID_num+"_face1_EMOTION_run1.txt"########### Modify according to file naming convention of choice ########################
         face2=ID_num+"_face2_EMOTION_run1.txt"########### Modify according to file naming convention of choice ########################
 
-    txtfilename1=path+'/sub-'+ID_num+'/originals/01+ePrimeData/'+face1######## Subject folders must start with a sub- , can modify !!! ####################
-    txtfilename2=path+'/sub-'+ID_num+'/originals/01+ePrimeData/'+face2######## Subject folders must start with a sub- , can modify !!! ####################
+    txtfilename1=path+'/sub-'+ID_num+'/originals/01+ePrimeData/sub-'+face1######## Subject folders must start with a sub- , can modify !!! ####################
+    txtfilename2=path+'/sub-'+ID_num+'/originals/01+ePrimeData/sub-'+face2######## Subject folders must start with a sub- , can modify !!! ####################
     
     fname1,ext1=os.path.splitext(face1)
     fname2,ext2=os.path.splitext(face2)
