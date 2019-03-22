@@ -6,7 +6,15 @@ Created on Sat Apr 21 10:05:12 2018
 @author: stan
 """
 
-#why json file in outer folder, not interior folder
+#combine coins2bids stuff into one file
+#modify eprime code to accomodate for different naming schemes
+#create a version of selected_scans for physio output
+#clean up repo - move irrelevant files to archive folder somewhere
+#clean up file names/parameter inputs to match each other
+#adapt to weird naming schemes in batch_ce (eprime files named different)
+#output error files with subject nums of failed runs, rough description of reason
+#clean up and comment some of the code for clarity
+#look at dcmnixx 2.0
 
 import bioread as br
 import numpy as np
@@ -106,7 +114,7 @@ class PhysioObject():
                 self.run[task].rr = int(len(self.run[task].rr_idx) / ((len(self.run[task].resp)/self.target_sampling_rate)/60.0))
             else:
                 ostr = """--------------\nWarning!\n  %s does not exist.\n  No physio TSV file will be created for %s, %s.\n--------------"""
-#                print("No acq file found for: %s, %s" % (self.subid, task))    
+#                print("No acq file found for: %s, %s" % (self.subid, task))    #maybe change this warning
                 print(ostr%(taskfile, self.subid, task))
                 self.write_to_missing(taskfile, task)
         self.hasloaded = True
@@ -209,7 +217,7 @@ def save_physio_tsv(physio_data, output_dir):
             k.append(physio_data.run[task].resp[:])
             p = np.array(k)
             np.savetxt(outfile, p.transpose(), delimiter='\t')
-            jsonpath = os.path.join(output_dir, tsv_name[task]+'.json')
+            jsonpath = os.path.join(output_dir, subid, 'func', tsv_name[task]+'.json')
             jsonfile = open(jsonpath,'w')
             jsonfile.write(physio_json)
             jsonfile.close()
