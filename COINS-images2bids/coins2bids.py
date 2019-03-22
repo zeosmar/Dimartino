@@ -188,7 +188,7 @@ for j in range(len(COINS_dcm2bids)):
             for i in range(len(json_data["descriptions"])):
                 if (str(json_data["descriptions"][i]["criteria"]["SeriesDescription"]) == "SpinEcho_Distortion_PA"):
                     lines[lsize+1]=lines[lsize+1].replace("SNum",str(json_data["descriptions"][i]["criteria"]["SeriesNumber"]))   
-    
+
     if str(COINS_dcm2bids.iloc[j,12])=='0':
         del lines[90:99]
     if str(COINS_dcm2bids.iloc[j,11])=='0':
@@ -214,13 +214,16 @@ for j in range(len(COINS_dcm2bids)):
     
     change=len(lines)-3
     lines[change]="        }"
+
+    if COINS_dcm2bids.iloc[j, 1] == '80103':
+        break
     try:
         f1=open(os.path.join(input_path,"sub-"+str(COINS_dcm2bids.iloc[j,1]),str(COINS_dcm2bids.iloc[j,1])+".json"),"w")
         for item in lines:
             f1.write(item)
         f1.close()
     except IOError:
-        pass
+        print('{} not found in source directory'.format(COINS_dcm2bids.iloc[j,1]))
         
     
             

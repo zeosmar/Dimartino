@@ -63,7 +63,7 @@ if args.output:
     fullpatho=os.path.join(heado,tailo)
     output_file=fullpatho
 
-
+runsheet = runsheet.drop_duplicates(subset='SubID: Study:9580')
 #Get the first row for getting the Scan name columsn later        
 listRow=runsheet.iloc[0,:]
 
@@ -74,6 +74,7 @@ newList=np.array([])
 for i in range(scan_names_bool.shape[0]):
     if scan_names_bool.iloc[i].any()==True:
         newList=np.append(newList,int(i))
+        
 
 #Store useful scans in list
 coins_bids=[]
