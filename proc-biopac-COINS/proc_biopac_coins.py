@@ -21,13 +21,14 @@ parser = MyParser(prog="proc_biopac_coins")
 parser.add_argument('-project','--project_directory', help="The project folder containing sourceData, etc. (Required)", required=True)
 parser.add_argument("-sublist", "--subject_list", help="File name listing subjects to process; defaults to 'subject_list.txt' in the working directory.", default='subject_list.txt')
 parser.add_argument("-templates", "--template_directory", help="Directory for physio templates; defaults to 'physio_templates' in project dir", default='physio_templates')
+parser.add_argument('-bids_dir', help='BIDs directory', required=True)
 args = parser.parse_args()
 
 project_dir = path.abspath(path.expanduser(args.project_directory))
 if args.template_directory == "physio_templates":
     template_dir = path.join(project_dir,"physio_templates")
 else:
-    template_dir = path.abspath(path.expanduser(project_dir))
+    template_dir = path.abspath(path.expanduser(args.template_directory))
     
 sublist = [fil.strip() for fil in open(args.subject_list)]
 
@@ -42,6 +43,6 @@ for sub in sublist:
     plot_subject_struct(physio, qa_dir)
     physio_out = os.path.join(project_dir,"BIDS")
     save_physio_csv(physio, project_dir)
-    save_physio_tsv(physio, physio_out)
+    save_physio_tsv(physio, args.bids_dir)
     print('')
     

@@ -5,6 +5,9 @@ Created on Sat Apr 21 10:05:12 2018
 
 @author: stan
 """
+
+#why json file in outer folder, not interior folder
+
 import bioread as br
 import numpy as np
 import scipy.signal as signal
@@ -82,7 +85,7 @@ class PhysioObject():
         with open(infile) as json_data:
             d = json.load(json_data)
         for task in self.tasklist:
-            taskfile = path.abspath(path.expanduser(d[task]))
+            taskfile = path.abspath(path.expanduser(d[task])) #change how behaves when there's no task file
             if path.isfile(taskfile):
                 print("loading: %s"%taskfile)
                 data = br.read_file(taskfile)
