@@ -46,6 +46,8 @@ if args.runsheet:
     
     fullpathr=os.path.join(headr,tailr)
     runsheet=pd.read_csv(fullpathr)
+    
+runsheet = runsheet.drop_duplicates(subset='SubID: Study:9580')
 
 
 if args.input_dir:
@@ -85,9 +87,12 @@ newList=np.array([])
 for i in range(0,len(newList1),2):
     if (i != len(newList)-2):
         newList=np.append(newList,newList1[i])
+        
+coins_df = pd.DataFrame({'SubID' : [], 'Rest1' : [], 'Rest2' : [], 'Face1' : [], 'Face2' : []})
     
 coins_bids=[]
 for sub in range(1,len(runsheet)):
+    
     success_list=np.array([])      
     for i in range(len(newList)):
         success_list=np.append(success_list,runsheet.iloc[sub,int(newList[i])])
@@ -136,6 +141,13 @@ for sub in range(1,len(runsheet)):
             df.iloc[0,0]=subdata[1][j]
             json_file["rest1"]=unicode(os.path.join(input_dir,"sub-"+runsheet["Scan_scanID"][sub]+"/originals/01+physio/sub-"+runsheet["Scan_scanID"][sub]+"_"+subdata[1][j].lower()+".acq"))
 
+    try:
+        df['SubID'] = str(int(runsheet.iloc[sub, 2]))
+    except:
+        str(runsheet.iloc[sub, 2])
+    
+    coins_df = coins_df.append(df, sort=True)
+    
     for j in range(len(subdata[1])):
         if json_file["face1"]==unicode("face1_path"):
             json_file["face1"]=unicode("")
@@ -146,6 +158,8 @@ for sub in range(1,len(runsheet)):
         elif json_file["rest2"]==unicode("rest2_path"):
             json_file["rest2"]=unicode("")
 
-    with open(os.path.join(input_dir,"physio_templates/sub-"+runsheet["Scan_scanID"][sub]+"_physio-template.json"),"w") as fp:
+    with open(os.path.join(input_dir,"physio_templates/sub-"+str(runsheet["Scan_scanID"][sub])+"_physio-template.json"),"w") as fp:
         json.dump(json_file,fp)
+        
+    coins_df.to_csv(os.path.join(input_dir, 'selected_physio.csv'), index=False)
     

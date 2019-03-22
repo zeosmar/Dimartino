@@ -6,15 +6,12 @@ Created on Sat Apr 21 10:05:12 2018
 @author: stan
 """
 
-#combine coins2bids stuff into one file
-#modify eprime code to accomodate for different naming schemes
 #create a version of selected_scans for physio output
-#clean up repo - move irrelevant files to archive folder somewhere
 #clean up file names/parameter inputs to match each other
 #adapt to weird naming schemes in batch_ce (eprime files named different)
 #output error files with subject nums of failed runs, rough description of reason
 #clean up and comment some of the code for clarity
-#look at dcmnixx 2.0
+#look at dcmnixx 2.0 - what's new/different in that code
 
 import bioread as br
 import numpy as np
