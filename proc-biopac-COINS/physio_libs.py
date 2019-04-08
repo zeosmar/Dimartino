@@ -6,7 +6,6 @@ Created on Sat Apr 21 10:05:12 2018
 @author: stan
 """
 
-#create a version of selected_scans for physio output
 #clean up file names/parameter inputs to match each other
 #adapt to weird naming schemes in batch_ce (eprime files named different)
 #output error files with subject nums of failed runs, rough description of reason
