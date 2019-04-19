@@ -43,8 +43,6 @@ if args.runsheet:
     fullpathr = os.path.join(headr,tailr)
     runsheet = pd.read_csv(fullpathr)
 
-runsheet = runsheet.drop_duplicates(subset='SubID: Study:9580')
-
 if args.input_dir:
     input_dir = args.input_dir
     
@@ -56,8 +54,6 @@ if args.temp_json:
     json_path = fullpathj
 else:
     json_path = os.path.join(input_dir, 'tracking-template.json')
-    
-listRow = runsheet.iloc[0,:]
 
 if not os.path.exists(os.path.join(input_dir,'tracking_templates')):
     os.mkdir(os.path.join(input_dir,'tracking_templates'))
@@ -66,68 +62,17 @@ with open(json_path) as json_file:
     json_file=json.load(json_file)
     print(json_file)
     
-with open(json_path,'r') as f:
-    lines = f.readlines()
-    
-scan_names_bool = listRow.str.contains('Physio')
-scan_names_bool = pd.DataFrame(scan_names_bool)
-newList1 = np.array([])
-for i in range(scan_names_bool.shape[0]):
-    if scan_names_bool.iloc[i].any()==True:
-        newList1=np.append(newList1,int(i))
-        
-newList = np.array([])
-for i in range(0,len(newList1),2):
-    if (i != len(newList)-2):
-        newList=np.append(newList,newList1[i])
-        
-coins_bids=[]
-for sub in range(1, len(runsheet)):
-    success_list=np.array([])
-    for i in range(len(newList)):
-        success_list=np.append(success_list,runsheet.iloc[sub,int(newList[i])])
-        
-    sheet_value = np.array([])
-    for i in range(len(success_list)):
-        if 'Face1' in success_list[i]:
-            if runsheet.iloc[sub,int(newList[i])+1]=='1':
-                sheet_value=np.append(sheet_value,newList[i])
-        elif 'Face2' in success_list[i]:
-            if runsheet.iloc[sub,int(newList[i])+1]=='1':
-                sheet_value=np.append(sheet_value,newList[i])
-                
-    scan_value = []
-    scan_name = []
-    
-    for i in range(len(sheet_value)):
-        scan_value.append(runsheet.iloc[0,int(sheet_value[i])])
-        scan_name.append(runsheet.iloc[sub,int(sheet_value[i])])
-        
-    subdata = []
-    subdata.append(scan_value)
-    subdata.append(scan_name)
-
-    
+for index, row in runsheet.iterrows():
     with open(json_path) as json_file:
         json_file=json.load(json_file)
         
-    df = pd.DataFrame(np.zeros((1,2)),columns=['Face1','Face2'])
-    for j in range(len(subdata[1])):
-        if subdata[1][j].find('Face1') != -1:
-            df.iloc[0,0]=subdata[1][j]
-            f = os.path.join(input_dir,'sub-'+runsheet['Scan_scanID'][sub]+'/originals/01+eyeTrackerData/'+runsheet['Scan_scanID'][sub]+'_'+subdata[1][j][-1]+'.edf')
-            if os.path.exists(f):
-                json_file['face1']=unicode(f)
-        if subdata[1][j].find('Face2') != -1:
-            df.iloc[0,1]=subdata[1][j]
-            f = os.path.join(input_dir,'sub-'+runsheet['Scan_scanID'][sub]+'/originals/01+eyeTrackerData/'+runsheet['Scan_scanID'][sub]+'_'+subdata[1][j][-1]+'.edf')
-            if os.path.exists(f):
-                json_file['face2']=unicode(f)
-    
-    if json_file['face1'] == unicode("face1_path"):
-        json_file['face1']=unicode('')
-    if json_file['face2'] == unicode("face2_path"):
-        json_file['face2']=unicode('')
+    for i in list(runsheet.columns):
+        subid = row['Scan_Subject_ID']
+        if i[-1].isdigit():
+            if row[i] != '0':
+                json_file[i] = os.path.join(input_dir, 'sub-' +subid, 'originals', '01+eyeTrackerData', 'sub-' +subid+ '_' +row[i]+'.acq')
+            else:
+                json_file[i] = ''
             
-    with open(os.path.join(input_dir,'tracking_templates/sub-'+str(runsheet['Scan_scanID'][sub]) + '_tracking-template.json'), 'w') as fp:
-        json.dump(json_file, fp)
+    with open(os.path.join(input_dir,"tracking_templates/sub-"+str(subid)+"_tracking-template.json"),"w") as fp:
+        json.dump(json_file,fp)

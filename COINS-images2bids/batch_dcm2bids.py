@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 from optparse import OptionParser
 import argparse
+import datetime
 
 #Take input form user
 class MyParser(argparse.ArgumentParser):
@@ -58,12 +59,13 @@ if args.COINS_BIDS:
     fullpathc=os.path.join(headc,tailc)
     coins_bids=pd.read_csv(fullpathc)
     
-subID=pd.DataFrame(coins_bids.iloc[:,1])
+subID=coins_bids['Scan_Subject_ID']
 
 for i in range(len(subID)):  
-     #cmd="/usr/local/Anaconda2/bin/dcm2bids -d " + fullpaths + "/sub-" + str(subID["subID"][i]) + " -p " + str(subID["subID"][i]) + " -c " + fullpaths + "/sub-"+ str(subID["subID"][i]) + "/" + str(subID["subID"][i]) + ".json" + " -o " + fullpathd
-    try:
-        cmd="dcm2bids -d " + fullpaths + "/sub-" + str(subID["subID"][i]) + " -p " + str(subID["subID"][i]) + " -c " + fullpaths + "/sub-"+ str(subID["subID"][i]) + "/" + str(subID["subID"][i]) + ".json" + " -o " + fullpathd
+    if os.path.exists(fullpaths + "/sub-"+ str(subID[i]) + "/" + str(subID[i]) + ".json"):
+        cmd="dcm2bids -d " + fullpaths + "/sub-" + str(subID[i]) + " -p " + str(subID[i]) + " -c " + fullpaths + "/sub-"+ str(subID[i]) + "/" + str(subID[i]) + ".json" + " -o " + fullpathd
         os.system(cmd)
-    except IOError:
-        print('Subject not in folder') #change to output error record to file
+    else:
+        f = open(fullpaths + '/error_log.txt', 'a')
+        f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'batch_dcm2bids', subID[i], 'subject not in source folder'))
+        f.close()
