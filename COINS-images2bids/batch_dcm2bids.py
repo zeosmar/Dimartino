@@ -58,14 +58,24 @@ if args.COINS_BIDS:
         
     fullpathc=os.path.join(headc,tailc)
     coins_bids=pd.read_csv(fullpathc)
-    
-subID=coins_bids['Scan_Subject_ID']
 
-for i in range(len(subID)):  
-    if os.path.exists(fullpaths + "/sub-"+ str(subID[i]) + "/" + str(subID[i]) + ".json"):
-        cmd="dcm2bids -d " + fullpaths + "/sub-" + str(subID[i]) + " -p " + str(subID[i]) + " -c " + fullpaths + "/sub-"+ str(subID[i]) + "/" + str(subID[i]) + ".json" + " -o " + fullpathd
+path = fullpaths.split('/')
+
+if 'sub-' in path[-1]:
+    subID = path[-1].lstrip('sub-')
+    if os.path.exists(fullpaths + '/' + str(subID) + ".json"):
+        cmd="dcm2bids -d " + fullpaths + " -p " + str(subID) + " -c " + fullpaths + "/" + str(subID) + ".json" + " -o " + fullpathd
         os.system(cmd)
     else:
-        f = open(fullpaths + '/error_log.txt', 'a')
-        f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'batch_dcm2bids', subID[i], 'subject not in source folder'))
-        f.close()
+        print('Error: subject not in source folder ' + subID)
+
+else:
+    subID=coins_bids['Scan_Subject_ID'] 
+    for i in range(len(subID)):  
+        if os.path.exists(fullpaths + "/sub-"+ str(subID[i]) + "/" + str(subID[i]) + ".json"):
+            cmd="dcm2bids -d " + fullpaths + "/sub-" + str(subID[i]) + " -p " + str(subID[i]) + " -c " + fullpaths + "/sub-"+ str(subID[i]) + "/" + str(subID[i]) + ".json" + " -o " + fullpathd
+            os.system(cmd)
+        else:
+            f = open(fullpaths + '/error_log.txt', 'a')
+            f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'batch_dcm2bids', subID[i], 'subject not in source folder'))
+            f.close()

@@ -200,7 +200,8 @@ def save_physio_csv(physio_data, output_dir):
 
 def save_physio_tsv(physio_data, output_dir):
     tasklist = physio_data.tasklist
-    subid = physio_data.subid
+    subid = physio_data.subid[:9]
+    subid2 = physio_data.subid
     tsv_name = {}
     tsv_name['rest1'] = subid+'_task-rest_run-01_physio'
     tsv_name['rest2'] = subid+'_task-rest_run-02_physio'
@@ -215,17 +216,17 @@ def save_physio_tsv(physio_data, output_dir):
         hr = physio_data.run[task].hr
         rr = physio_data.run[task].rr
         if hr is not np.nan and rr is not np.nan:
-            outpath = os.path.join(output_dir, subid, 'func')
+            outpath = os.path.join(output_dir, subid2, 'func')
             if not os.path.exists(outpath):
                 os.makedirs(outpath)
-            outfile = os.path.join(output_dir,subid,"func",tsv_name[task]+'.tsv')
+            outfile = os.path.join(output_dir,subid2,"func",tsv_name[task]+'.tsv')
             print("Writing: %s"%outfile)
             k = []
             k.append(physio_data.run[task].pulse[:])
             k.append(physio_data.run[task].resp[:])
             p = np.array(k)
             np.savetxt(outfile, p.transpose(), delimiter='\t')
-            jsonpath = os.path.join(output_dir, subid, 'func', tsv_name[task]+'.json')
+            jsonpath = os.path.join(output_dir, subid2, 'func', tsv_name[task]+'.json')
             jsonfile = open(jsonpath,'w')
             jsonfile.write(physio_json)
             jsonfile.close()

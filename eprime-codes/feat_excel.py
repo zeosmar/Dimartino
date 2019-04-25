@@ -121,14 +121,18 @@ def feat_creation(csvpath,f1):
                 f_c=0
                 s_rt=0
                 f_rt=0
+
                 for i in range(0,len(df)):
-                    if (df.loc[i,"Procedure"]=="Shape"):
-                        s_c=s_c+1
-                        s_rt=s_rt + df["StimSlide.RT"][i]
-                    elif (df.loc[i,"Procedure"]=="Face"):
-                        f_c=f_c+1                    
-                        f_rt=f_rt+df["StimSlide.RT"][i]
-                    else:
+                    try:
+                        if (df.loc[i,"Procedure"]=="Shape"):
+                            s_c=s_c+1
+                            s_rt=s_rt + float(df["StimSlide.RT"][i])
+                        elif (df.loc[i,"Procedure"]=="Face"):
+                            f_c=f_c+1                    
+                            f_rt=f_rt+float(df["StimSlide.RT"][i])
+                        else:
+                            continue
+                    except:
                         continue
                 df_s=pd.DataFrame(np.zeros(s_c))
                 df_f=pd.DataFrame(np.zeros(f_c))
@@ -265,11 +269,13 @@ def feat_creation(csvpath,f1):
                 face_c_write=face_r[["Onset","Duration","Wait"]]
                 face_w_write=face_w[["Onset","Duration","Wait"]]
                 
+                name = f1[:9]
+                
                 #Save the data in separate .txt files    
-                print shape_c_write.to_csv(newpath+"/"+f1+"/feat/"+tail+"_shape_correct.txt",header=False, sep=' ',mode='w',index=False)     
-                print shape_w_write.to_csv(newpath+"/"+f1+"/feat/"+tail+"_shape_incorrect.txt",header=False, sep=' ',mode='w',index=False)     
-                print face_c_write.to_csv(newpath+"/"+f1+"/feat/"+tail+"_face_correct.txt",header=False, sep=' ',mode='w',index=False)     
-                print face_w_write.to_csv(newpath+"/"+f1+"/feat/"+tail+"_face_incorrect.txt",header=False, sep=' ',mode='w',index=False)     
+                shape_c_write.to_csv(newpath+"/"+f1+"/feat/"+name+"_shape_correct.txt",header=False, sep=' ',mode='w',index=False)     
+                shape_w_write.to_csv(newpath+"/"+f1+"/feat/"+name+"_shape_incorrect.txt",header=False, sep=' ',mode='w',index=False)     
+                face_c_write.to_csv(newpath+"/"+f1+"/feat/"+name+"_face_correct.txt",header=False, sep=' ',mode='w',index=False)     
+                face_w_write.to_csv(newpath+"/"+f1+"/feat/"+name+"_face_incorrect.txt",header=False, sep=' ',mode='w',index=False)     
                 
                 #stores each subject trial response
                 if run_count==1:

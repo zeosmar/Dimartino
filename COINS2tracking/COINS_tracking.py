@@ -70,7 +70,7 @@ for index, row in runsheet.iterrows():
         subid = row['Scan_Subject_ID']
         if i[-1].isdigit():
             if row[i] != '0':
-                json_file[i] = os.path.join(input_dir, 'sub-' +subid, 'originals', '01+eyeTrackerData', 'sub-' +subid+ '_' +row[i]+'.acq')
+                json_file[i] = os.path.join(input_dir, 'sub-' +subid, 'originals', '01+eyeTracker', row[i]+'.edf')
             else:
                 json_file[i] = ''
             

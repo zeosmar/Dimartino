@@ -38,7 +38,7 @@ parser=MyParser(prog="COINS_BIDS")
 parser.add_argument("--runsheet",dest="runsheet", required=True, help='Path to the COINS run sheet')
 parser.add_argument("--keysheet",dest="keysheet", required=True, help='Path to the COINS key sheet')
 parser.add_argument("--temp_json",dest="temp_json", required=True, help='Path to config.json')
-parser.add_argument("--sub_dir",dest="input_path", required=True, help='Path to subject source directory')
+parser.add_argument("--sub_dir",dest="input_path", required=True, help='Path to subject source directory or single subject folder')
 
 #Checking if attempt has been made to pass arguments
 if len(sys.argv)==1:

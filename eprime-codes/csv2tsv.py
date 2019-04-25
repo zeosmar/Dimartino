@@ -31,7 +31,6 @@ if options.subID:
        
 path=os.getcwd()
 
-print "Note: Please make sure all the subjects entered have ePrimeData or else you will get a errors for them during execution, running csv2tsv now..."
 #create list of number of csv files per subID and write a log file if nmber of runs less than or greater than 2
 def extension_tsv(csvpath,f,newpath):
 
@@ -136,7 +135,7 @@ def csv_df(f2):
 if options.subID:
     f=options.subID
     try:        
-        head,tail=os.path.split(f)
+        head,tail=os.path.split(f) 
         if head=='':
             if options.input_dir:
                 csvpath=options.input_dir
@@ -150,16 +149,18 @@ if options.subID:
         csv_list=extension_tsv(csvpath,tail,newpath)
         try:
             for f2 in open(csvpath+"/"+tail+"/eprime_csvfiles/csv_list.txt","r"):
-                f2=f2.strip("\n")
-                df,tail1=csv_df(f2)
-                num=tail1[-1]
-                tail2=tail1[:-6]
-                name=tail2.lstrip("sub-")
+                f2=f2.strip("\n")                    
+                df,tail=csv_df(f2)
+                num=tail[-1]
+                tail1=tail.split('_')
+                name = tail1[0]
+                name = name.split('-')
+                name = name[-1]
+                name2 = name[:5]
                 
-                if not os.path.exists(newpath+"/"+ "sub-"+ name +"/func"): ##### Modify with required naming convention ###################
-                    os.makedirs(newpath+"/"+ "sub-"+ name +"/func") ##### Modify with required naming convention ###################
-                
-                print df.to_csv(newpath+"/"+"sub-"+ name+'/func/sub-'+name+'_task-faces_run-0'+str(num)+'_events.tsv',header=True, sep='\t',mode='w',index=False)
+                if not os.path.exists(newpath+"/"+ 'sub-' +name +"/func"): ##### Modify with required naming convention ###################
+                    os.makedirs(newpath+"/"+ 'sub-' +name +"/func") ##### Modify with required naming convention ###################
+                df.to_csv(newpath+"/"+'sub-' +name+'/func/sub-'+name2+'_task-faces_run-0'+str(num)+'_events.tsv',header=True, sep='\t',mode='w',index=False)
                 ##### Modify with required naming convention ###################
             os.remove(csvpath+"/"+f+"/eprime_csvfiles/csv_list.txt")
         except IOError:
@@ -180,16 +181,19 @@ else:
                 f2=f2.strip("\n")                    
                 df,tail=csv_df(f2)
                 num=tail[-1]
-                tail1=tail[:-6]
-                name=tail1.lstrip("sub-")
+                tail1=tail.split('_')
+                name = tail1[0]
+                name = name.split('-')
+                name = name[-1]
+                name2 = name[:5]
                                        
-                if not os.path.exists(newpath+"/"+ "sub-"+ name +"/func"): ##### Modify with required naming convention ###################
-                    os.makedirs(newpath+"/"+ "sub-"+ name +"/func") ##### Modify with required naming convention ###################
-                print df.to_csv(newpath+"/"+"sub-"+ name+'/func/sub-'+name+'_task-faces_run-0'+str(num)+'_events.tsv',header=True, sep='\t',mode='w',index=False)
+                if not os.path.exists(newpath+"/"+ 'sub-' +name +"/func"): ##### Modify with required naming convention ###################
+                    os.makedirs(newpath+"/"+ 'sub-' +name +"/func") ##### Modify with required naming convention ###################
+                df.to_csv(newpath+"/"+'sub-' +name+'/func/sub-'+name2+'_task-faces_run-0'+str(num)+'_events.tsv',header=True, sep='\t',mode='w',index=False)
                 ##### Modify with required naming convention ###################
             os.remove(csvpath+"/"+f+"/eprime_csvfiles/csv_list.txt")
         except IOError:
-            print IOError 
+            print('IO Error')
             continue
     #os.remove(csvpath+"/"+f+"/eprime_csvfiles/csv_list.txt")
 #os.remove(csvpath+"/sub_list.txt")

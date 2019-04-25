@@ -74,8 +74,6 @@ def dilationspeed(data):
     time = np.array(data.time[:])
     
     data.startsize = pupil.size
-    data.org_first = [gazex[0], gazey[0], pupil[0]]
-    data.org_last = [gazex[-1], gazey[-1], pupil[-1]]
     
     dilation_speed = []
     for i in range(pupil.size):
@@ -178,6 +176,9 @@ def invalid(data):
     gazey = data.gazey[:]
     pupil = data.pupil[:]
     time = data.time[:]
+    
+    data.org_first = [gazex[0], gazey[0], pupil[0]]
+    data.org_last = [gazex.iloc[-1], gazey.iloc[-1], pupil.iloc[-1]]
 
     cuta = np.logical_and(gazex > 0, gazex < 1920 + 50)
     gazex = gazex[cuta]
@@ -465,14 +466,14 @@ class TrackData:
         fig2.suptitle ('% valid: {}, blink count: {}, blink rate: {}'.format(per_valid, blink_count, blink_rate))
         fig2 = plt.gcf()
         
-        self.qc_metrics = {'pct_roi_right' : per_right,
-                           'pct_roi_left' : per_left,
-                           'pct_roi_center' : per_center,
-                           'pct_roi_fix' : per_fix,
-                           'pct_any_roi' : per_roi,
-                           'pct_valid' : per_valid,
-                           'blink_count' : blink_count,
-                           'blink_rate' : blink_rate}
+        self.qc_metrics = {'pct_roi_right' : [per_right],
+                           'pct_roi_left' : [per_left],
+                           'pct_roi_center' : [per_center],
+                           'pct_roi_fix' : [per_fix],
+                           'pct_any_roi' : [per_roi],
+                           'pct_valid' : [per_valid],
+                           'blink_count' : [blink_count],
+                           'blink_rate' : [blink_rate]}
         
         self.graphs = (fig, fig2)
         
@@ -520,41 +521,45 @@ class TrackObject:
         
     def load_from_template(self, infile):
         infile = os.path.abspath(os.path.expanduser(infile))
-        with open(infile) as json_data:
-            d = json.load(json_data)
-        for task in self.tasklist:
-            taskfile = os.path.abspath(os.path.expanduser(d[task]))
-            if os.path.isfile(taskfile):
-                print('loading: {}'.format(taskfile))
-                data = self.parse_asc(taskfile)
-                gazex, gazey, pupil, time, samprate = self.get_data(data)
-                self.run[task].gazex = gazex
-                self.run[task].gazey = gazey
-                self.run[task].pupil = pupil
-                self.run[task].time = time
-                self.run[task].org_start = time[0]
-                self.run[task].org_end = time[-1]
-                self.run[task].sampling_rate = samprate
-                print('Processing: {}, {}'.format(self.subid, task))
-                self.native_sampling_rate = samprate
-                self.run[task] = downsample(self.run[task], 4)
-                print('Blink Detection: ...')
-                self.run[task] = invalid(self.run[task])
-                self.run[task] = dilationspeed(self.run[task])
-                print('Blink Correction: ...')
-                self.run[task] = trendline(self.run[task])
-                print('Normalizing Pupil: ...')
-                self.run[task] = normalize(self.run[task])
-                print('Downsampling: ...')
-                self.run[task] = flipy(self.run[task])
-                #self.run[task] = downsample(self.run[task], 800)
-                self.run[task].qc()
-            else:
-                ostr = """-------------\nWarning!\n {} does not exist.\n
-                No tracking TSV file will be cretaed for {}, {}.\n-------------"""
-                print(ostr.format(taskfile, self.subid, task))
-                self.write_to_missing(taskfile, task)
-        self.hasloaded=True
+        try:
+
+            with open(infile) as json_data:
+                d = json.load(json_data)
+            for task in self.tasklist:
+                taskfile = os.path.abspath(os.path.expanduser(d[task]))
+                if os.path.isfile(taskfile) and d[task] != '':
+                    print('loading: {}'.format(taskfile))
+                    data = self.parse_asc(taskfile)
+                    gazex, gazey, pupil, time, samprate = self.get_data(data)
+                    self.run[task].gazex = gazex
+                    self.run[task].gazey = gazey
+                    self.run[task].pupil = pupil
+                    self.run[task].time = time
+                    self.run[task].org_start = time[0]
+                    self.run[task].org_end = time[-1]
+                    self.run[task].sampling_rate = samprate
+                    print('Processing: {}, {}'.format(self.subid, task))
+                    self.native_sampling_rate = samprate
+                    self.run[task] = downsample(self.run[task], 4)
+                    print('Blink Detection: ...')
+                    self.run[task] = invalid(self.run[task])
+                    self.run[task] = dilationspeed(self.run[task])
+                    print('Blink Correction: ...')
+                    self.run[task] = trendline(self.run[task])
+                    print('Normalizing Pupil: ...')
+                    self.run[task] = normalize(self.run[task])
+                    print('Downsampling: ...')
+                    self.run[task] = flipy(self.run[task])
+                    self.run[task] = downsample(self.run[task], 800)
+                    self.run[task].qc()
+                elif not os.path.isfile(taskfile) and d[task] != '':
+                    ostr = """-------------\nWarning!\n {} does not exist.\n
+                    No tracking TSV file will be cretaed for {}, {}.\n-------------"""
+                    print(ostr.format(taskfile, self.subid, task))
+                    self.write_to_missing(taskfile, task)
+            self.hasloaded=True
+        except IOError:
+            print('No file: {}'.format(infile))
         
     def parse_asc(self, edffile):
         cmd = 'edf2asc {}'.format(edffile)
@@ -661,7 +666,8 @@ class TrackObject:
         
     def save_track_tsv(self, track_data, output_dir):
         tasklist = track_data.tasklist
-        subid = track_data.subid
+        subid = track_data.subid[:9]
+        subid2 = track_data.subid
         tsv_name = {}
         tsv_name['face1'] = subid+'_task-faces_run-01_tracking'
         tsv_name['face2'] = subid+'_task-faces_run-02_tracking'
@@ -675,7 +681,7 @@ class TrackObject:
             gazey = track_data.run[task].gazey
             pupil = track_data.run[task].pupil
             if gazex is not np.nan and gazey is not np.nan and pupil is not np.nan:
-                outfile = os.path.join(output_dir, subid, 'func', tsv_name[task]+'.tsv')
+                outfile = os.path.join(output_dir, subid2, 'func', tsv_name[task]+'.tsv')
                 print('Writing: {}'.format(outfile))
                 k = []
                 k.append(track_data.run[task].gazex[:])
@@ -683,7 +689,7 @@ class TrackObject:
                 k.append(track_data.run[task].pupil[:])
                 p = np.array(k)
                 np.savetxt(outfile, p.transpose(), delimiter='\t')
-                jsonpath = os.path.join(output_dir, tsv_name[task]+'.json')
+                jsonpath = os.path.join(output_dir, subid2, 'func', tsv_name[task]+'.json')
                 jsonfile = open(jsonpath, 'w')
                 jsonfile.write(track_json)
                 jsonfile.close()
@@ -724,7 +730,7 @@ class TrackObject:
             if qc_metrics != []:
                 
                 if os.path.exists(csv_path):
-                    df = pd.read_csv(csv_path, index_col=None)
+                    df = pd.read_csv(csv_path)
                 else:
                     df = pd.DataFrame({'pct_roi_right' : [],
                            'pct_roi_left' : [],
@@ -736,6 +742,7 @@ class TrackObject:
                            'blink_rate' : []})
                     
                 qc_metrics['task'] = task
+                print(qc_metrics)
                 new_df = pd.DataFrame(qc_metrics)
                 
                 final_df = df.merge(new_df, how = 'outer')

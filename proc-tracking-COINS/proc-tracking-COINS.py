@@ -71,7 +71,9 @@ for sub in sublist:
     track.project_directory = project_dir
     sub_template = os.path.join(template_dir, '{}_tracking-template.json'.format(sub))
     track.load_from_template(sub_template)
-    qa_dir = os.path.join(project_dir, sub, 'QC', 'physio')
+    qa_dir = os.path.join(project_dir, sub, 'QC', 'tracking')
+    if not os.path.exists(qa_dir):
+        os.makedirs(qa_dir)
     track.plot_qc_graphs(track, qa_dir)
     track.save_qc_csv(track, qa_dir)
     track_out = os.path.join(project_dir, 'BIDS')
