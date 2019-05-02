@@ -20,7 +20,7 @@ cmd : dcm2niix edf2asc
 	*if command line throws an error during this step, try instead using
 		source activate [name]
 
-3) pip install bioread dcm2bids argparse json
+3) pip install bioread dcm2bids argparse
 
 4) dcm2niix
 	*if the command line does not know what this command is, follow instructions
