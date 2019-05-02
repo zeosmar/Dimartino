@@ -6,7 +6,33 @@ Dependencies:
 python : numpy pandas matplotlib json argparse bioread dcm2bids
 cmd : dcm2niix edf2asc
 
-1) 
+
+**Using the command line**
+
+1) conda create --name [name] --file [/Path/to/requirements.txt]
+	*where 'name' is the name you would like to give your environment
+	*where '/Path/to/requirements.txt' is the path to requirements.txt, downloaded
+		from github
+
+2) conda activate [name] 
+	*where 'name' is the name you gave your environment in step 1
+
+	*if command line throws an error during this step, try instead using
+		source activate [name]
+
+3) pip install bioread dcm2bids argparse json
+
+4) dcm2niix
+	*if the command line does not know what this command is, follow instructions
+		here to add dcm2niix to your command environment
+	*if the command line produces usage instructions (e.g. examples), continue to next step
+
+**Additional**
+
+5) Move the file edf2asc (downloaded from github) to the following directory:
+	[/Path/to/Anaconda/Folder]/envs/[name]/bin
+	*where 'Path/to/Anaconda/Folder is the path to the anaconda source folder
+	*where 'name' is the name you gave your environment in step	1
 
 # Script Instructions
 
