@@ -1,4 +1,4 @@
-# Dimartino
+# Environment Installation
 
 Environment: Python 2.7
 
@@ -6,16 +6,33 @@ Dependencies:
 python : numpy pandas matplotlib json argparse bioread dcm2bids
 cmd : dcm2niix edf2asc
 
+1) 
+
+# Script Instructions
+
 1) COINS-images2bids/COINS_BIDS_setup.py : pulls relevant information from COINS runsheet and prepares for dcm2bids
   --runsheet /Path/to/COINS/runsheet
   --keysheet /Path/to/COINS/keysheet (COINS-images2bids/COINS_run_sheet_key.csv)
   --temp_json /Path/to/config.json (COINS-images2bids/config.json)
   --sub_dir /Path/to/subject/source/directory 
   
+  *needed for input: 
+    COINS runsheet
+    keysheet (downloaded from github)
+    model json file (downloaded from github)
+    a folder containing diicom data
+  *output: 
+    sub_dir/selected_scans.txt - contains file names of good scan runs for each subject, based on COINS sheet
+    sub_dir/selected_physio.txt - contains file names of good physio data for each subject, based on COINS sheet
+    sub_dir/selected_track.txt - contains file names of good tracking data for each subject, based on COINS sheet
+    sub_dir/[subID]/[subID].json - contains file names of good scan runs for the subject, based on COINS sheet
+    sub_dir/error_log.txt - a text file listing any subjects from the COINS sheet that did not compile correctly
+      *most common is 'subject not in source folder' - just indicates that your sub_dir did not contain diicom data for a particular subject, does not indicate malfunctioning code, does not cause a problem with the output produced from other subjects
+  
 2) COINS-images2bids/batch_dcm2bids.py : converts scan diicoms to nifti, outputs in BIDS format
   --source /Path/to/subject/source/directory (or single subject directory)
   --destination /Path/to/bids/folder 
-  --COINS_BIDS /Path/to/selectedscans.csv (step 1 output)
+  --COINS_BIDS /Path/to/selected_scans.csv (step 1 output)
   
 3) COINS2physio/COINS_physio.py : generates jsons for physio processing
   --runsheet /Path/to/selectedphysio.csv (step 1 output)
