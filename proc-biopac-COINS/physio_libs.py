@@ -73,16 +73,16 @@ class PhysioObject():
         resp_str = u'Custom, DA100C'
         for k in range(len(acq.channels)):
             cname = acq.channels[k].name
-            if cname == "TRIGGER" or cname == trigger_str:
+            if "TRIGGER" in cname or trigger_str in cname:
                 trig = acq.channels[k].data
-            elif cname == "PULSE" or cname == pulse_str:
+            elif "PULSE" in cname or pulse_str in cname:
                 pulse = acq.channels[k].data
-            elif cname == "RESP" or cname == resp_str:
+            elif "RESP" in cname or resp_str in cname:
                 resp = acq.channels[k].data
         idx = np.where(trig)
         pulse = pulse[idx]
         resp = resp[idx]
-        return(pulse, resp, idx[0]) #add idx
+        return(pulse, resp, idx[0])
         
     def load_from_template(self,infile):
         infile = path.abspath(path.expanduser(infile))
@@ -91,38 +91,45 @@ class PhysioObject():
                 d = json.load(json_data)
             for task in self.tasklist:
                 taskfile = path.abspath(path.expanduser(d[task])) #change how behaves when there's no task file
-                if path.isfile(taskfile):
+                if d[task] != '' and path.isfile(taskfile):
+                    print("loading: %s"%taskfile)
+                    data = br.read_file(taskfile)
                     try:
                         print("loading: %s"%taskfile)
                         data = br.read_file(taskfile)
                         pulse, resp, idx = self.get_channels(data)
-                        print(idx)
                         self.run[task].resp = resp
                         self.run[task].pulse= pulse
+                    except:
+                        print('Error loading {}, {}'.format(self.subid, task))
+                        f = open('error_log.txt', 'a')
+                        f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-biopac-coins', self.subid, 'load error'))
+                        f.close()
+                    try:
                         print("Processing: %s, %s"%(self.subid, task))
                         self.samples_per_second = int(data.samples_per_second)
                         self.run[task].pulse = signal.medfilt(self.run[task].pulse,3)
                         self.run[task].resp = signal.medfilt(self.run[task].resp,3) 
                         if self.samples_per_second != self.target_sampling_rate:
                             scale = int(self.samples_per_second / self.target_sampling_rate)
+                            print(self.run[task].pulse)
                             self.run[task].pulse = signal.decimate(self.run[task].pulse,scale,zero_phase=True)
                             self.run[task].resp = signal.decimate(self.run[task].resp,scale,zero_phase=True)
                         self.run[task].hr_idx = signal.find_peaks_cwt(self.run[task].pulse, np.arange(1,35))
                         self.run[task].hr = int(len(self.run[task].hr_idx) / ((len(self.run[task].pulse)/self.target_sampling_rate)/60.0))
                         self.run[task].rr_idx = signal.find_peaks_cwt(moving_average(self.run[task].resp,50), np.arange(1,70))
                         self.run[task].rr = int(len(self.run[task].rr_idx) / ((len(self.run[task].resp)/self.target_sampling_rate)/60.0))
-                    except:
+                    except IOError:
+                        print('Error processing {}, {}'.format(self.subid, task))
                         f = open('error_log.txt', 'a')
-                        f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-biopac-coins', self.subid, 'load error'))
+                        f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-biopac-coins', self.subid, 'processing error'))
                         f.close()
-                else:
-                    ostr = """--------------\nWarning!\n  %s does not exist.\n  No physio TSV file will be created for %s, %s.\n--------------"""
-#                    print("No acq file found for: %s, %s" % (self.subid, task))    #maybe change this warning
-                    print(ostr%(taskfile, self.subid, task))
-                    self.write_to_missing(taskfile, task)
             self.hasloaded = True
         else:
-            print('There is no json file for this subject') #output to log file
+            print('There is no json file for this subject') 
+            f = open('error_log.txt', 'a')
+            f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-biopac-coins', self.subid, 'no json file'))
+            f.close()
 
 def lfr(X, order = 3, cutoff_freq = 0.01):
     #Identify low frequency drift and remove 

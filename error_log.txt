@@ -1,0 +1,27 @@
+2019-05-03 13:32:18.151614 : proc-biopac-coins : sub-80043 : load error
+2019-05-03 13:32:18.179192 : proc-biopac-coins : sub-80043 : load error
+2019-05-03 13:32:18.211316 : proc-biopac-coins : sub-80043 : load error
+2019-05-03 13:33:28.029320 : proc-biopac-coins : sub-80109 : load error
+2019-05-03 13:33:28.113233 : proc-biopac-coins : sub-80109 : load error
+2019-05-03 13:33:28.165716 : proc-biopac-coins : sub-80109 : load error
+2019-05-03 13:33:33.965853 : proc-biopac-coins : sub-80111b : load error
+2019-05-03 13:33:36.698016 : proc-biopac-coins : sub-80111b : load error
+2019-05-03 13:43:34.914365 : proc-biopac-coins : sub-80043 : load error
+2019-05-03 13:43:34.917618 : proc-biopac-coins : sub-80043 : processing error
+2019-05-03 13:43:34.973720 : proc-biopac-coins : sub-80043 : load error
+2019-05-03 13:43:34.975767 : proc-biopac-coins : sub-80043 : processing error
+2019-05-03 13:43:35.030615 : proc-biopac-coins : sub-80043 : load error
+2019-05-03 13:43:35.032641 : proc-biopac-coins : sub-80043 : processing error
+2019-05-03 13:43:35.798997 : proc-biopac-coins : sub-80083 : no json file
+2019-05-03 13:43:36.560351 : proc-biopac-coins : sub-80084 : no json file
+2019-05-03 13:43:37.228251 : proc-biopac-coins : sub-80095 : no json file
+2019-05-03 13:43:56.641109 : proc-biopac-coins : sub-80103 : processing error
+2019-05-03 13:43:57.133477 : proc-biopac-coins : sub-80103 : processing error
+2019-05-03 13:43:57.521856 : proc-biopac-coins : sub-80103 : processing error
+2019-05-03 13:44:43.454779 : proc-biopac-coins : sub-80043 : load error
+2019-05-03 13:50:01.867984 : proc-biopac-coins : sub-80043 : load error
+2019-05-03 13:50:22.661711 : proc-biopac-coins : sub-80043 : load error
+2019-05-03 13:50:44.098625 : proc-biopac-coins : sub-80043 : load error
+2019-05-03 14:05:11.190822 : proc-biopac-coins : sub-80083 : no json file
+2019-05-03 14:05:11.852807 : proc-biopac-coins : sub-80084 : no json file
+2019-05-03 14:05:12.534950 : proc-biopac-coins : sub-80095 : no json file

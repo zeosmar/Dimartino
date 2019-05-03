@@ -42,11 +42,11 @@ cmd : dcm2niix edf2asc
   --temp_json /Path/to/config.json (COINS-images2bids/config.json)
   --sub_dir /Path/to/subject/source/directory 
   
-  *needed for input: 
-    COINS runsheet
-    keysheet (downloaded from github)
-    model json file (downloaded from github)
-    a folder containing diicom data
+  * needed for input: 
+    * COINS runsheet
+    * keysheet (downloaded from github)
+    * model json file (downloaded from github)
+    * a folder containing diicom data
   *output: 
     sub_dir/selected_scans.txt - contains file names of good scan runs for each subject, based on COINS sheet
     sub_dir/selected_physio.txt - contains file names of good physio data for each subject, based on COINS sheet
@@ -56,14 +56,14 @@ cmd : dcm2niix edf2asc
       *most common is 'subject not in source folder' - just indicates that your sub_dir did not contain diicom data for a particular subject, does not indicate malfunctioning code, does not cause a problem with the output produced from other subjects
   
 2) COINS-images2bids/batch_dcm2bids.py : converts scan diicoms to nifti, outputs in BIDS format
-  --source /Path/to/subject/source/directory (or single subject directory)
-  --destination /Path/to/bids/folder 
-  --COINS_BIDS /Path/to/selected_scans.csv (step 1 output)
+  * --source /Path/to/subject/source/directory (or single subject directory)
+  * --destination /Path/to/bids/folder 
+  * --COINS_BIDS /Path/to/selected_scans.csv (step 1 output)
   
 3) COINS2physio/COINS_physio.py : generates jsons for physio processing
-  --runsheet /Path/to/selectedphysio.csv (step 1 output)
-  --input_dir /Path/to/source/directory
-  --temp_json /Path/to/physio-template.json (COINS2physio/physio-template.json)
+  * --runsheet /Path/to/selectedphysio.csv (step 1 output)
+  * --input_dir /Path/to/source/directory
+  * --temp_json /Path/to/physio-template.json (COINS2physio/physio-template.json)
   
 4) proc-biopac-COINS/proc_biopac_coins.py : process and QC physio data
   --project_directory /Path/to/source/directory
