@@ -112,7 +112,6 @@ class PhysioObject():
                         self.run[task].resp = signal.medfilt(self.run[task].resp,3) 
                         if self.samples_per_second != self.target_sampling_rate:
                             scale = int(self.samples_per_second / self.target_sampling_rate)
-                            print(self.run[task].pulse)
                             self.run[task].pulse = signal.decimate(self.run[task].pulse,scale,zero_phase=True)
                             self.run[task].resp = signal.decimate(self.run[task].resp,scale,zero_phase=True)
                         self.run[task].hr_idx = signal.find_peaks_cwt(self.run[task].pulse, np.arange(1,35))
