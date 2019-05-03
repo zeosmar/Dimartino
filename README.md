@@ -22,14 +22,12 @@ cmd : dcm2niix edf2asc
 
 3) pip install bioread dcm2bids argparse
 
-4) dcm2niix
-	*if the command line does not know what this command is, follow instructions
-		here to add dcm2niix to your command environment
-	*if the command line produces usage instructions (e.g. examples), continue to next step
+4) conda install -c conda-forge dcm2niix
+
 
 **Additional**
 
-5) Move the file edf2asc (downloaded from github) to the following directory:
+5) Move the file edf2asc (provided via email) to the following directory:
 	[/Path/to/Anaconda/Folder]/envs/[name]/bin
 	*where 'Path/to/Anaconda/Folder is the path to the anaconda source folder
 	*where 'name' is the name you gave your environment in step	1
@@ -37,23 +35,23 @@ cmd : dcm2niix edf2asc
 # Script Instructions
 
 1) COINS-images2bids/COINS_BIDS_setup.py : pulls relevant information from COINS runsheet and prepares for dcm2bids
-  --runsheet /Path/to/COINS/runsheet
-  --keysheet /Path/to/COINS/keysheet (COINS-images2bids/COINS_run_sheet_key.csv)
-  --temp_json /Path/to/config.json (COINS-images2bids/config.json)
-  --sub_dir /Path/to/subject/source/directory 
+  * --runsheet /Path/to/COINS/runsheet
+  * --keysheet /Path/to/COINS/keysheet (COINS-images2bids/COINS_run_sheet_key.csv)
+  * --temp_json /Path/to/config.json (COINS-images2bids/config.json)
+  * --sub_dir /Path/to/subject/source/directory 
   
   * needed for input: 
     * COINS runsheet
     * keysheet (downloaded from github)
     * model json file (downloaded from github)
     * a folder containing diicom data
-  *output: 
-    sub_dir/selected_scans.txt - contains file names of good scan runs for each subject, based on COINS sheet
-    sub_dir/selected_physio.txt - contains file names of good physio data for each subject, based on COINS sheet
-    sub_dir/selected_track.txt - contains file names of good tracking data for each subject, based on COINS sheet
-    sub_dir/[subID]/[subID].json - contains file names of good scan runs for the subject, based on COINS sheet
-    sub_dir/error_log.txt - a text file listing any subjects from the COINS sheet that did not compile correctly
-      *most common is 'subject not in source folder' - just indicates that your sub_dir did not contain diicom data for a particular subject, does not indicate malfunctioning code, does not cause a problem with the output produced from other subjects
+  * output: 
+    * sub_dir/selected_scans.txt - contains file names of good scan runs for each subject, based on COINS sheet
+    * sub_dir/selected_physio.txt - contains file names of good physio data for each subject, based on COINS sheet
+    * sub_dir/selected_track.txt - contains file names of good tracking data for each subject, based on COINS sheet
+    * sub_dir/[subID]/[subID].json - contains file names of good scan runs for the subject, based on COINS sheet
+    * sub_dir/error_log.txt - a text file listing any subjects from the COINS sheet that did not compile correctly
+      * most common is 'subject not in source folder' - just indicates that your sub_dir did not contain diicom data for a particular subject, does not indicate malfunctioning code, does not cause a problem with the output produced from other subjects
   
 2) COINS-images2bids/batch_dcm2bids.py : converts scan diicoms to nifti, outputs in BIDS format
   * --source /Path/to/subject/source/directory (or single subject directory)
