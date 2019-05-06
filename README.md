@@ -29,17 +29,17 @@ cmd : dcm2niix edf2asc
 
 5) Move the file edf2asc (provided via email) to the following directory:
 	[/Path/to/Anaconda/Folder]/envs/[name]/bin
-	*where 'Path/to/Anaconda/Folder is the path to the anaconda source folder
-	*where 'name' is the name you gave your environment in step	1
+	* where 'Path/to/Anaconda/Folder is the path to the anaconda source folder
+	* where 'name' is the name you gave your environment in step 1
 
 # Script Instructions
 
 1) COINS-images2bids/COINS_BIDS_setup.py : pulls relevant information from COINS runsheet and prepares for dcm2bids
-  * --runsheet /Path/to/COINS/runsheet
-  * --keysheet /Path/to/COINS/keysheet (COINS-images2bids/COINS_run_sheet_key.csv)
-  * --temp_json /Path/to/config.json (COINS-images2bids/config.json)
-  * --sub_dir /Path/to/subject/source/directory 
-  
+  * arguments
+    * --runsheet /Path/to/COINS/runsheet
+    * --keysheet /Path/to/COINS/keysheet (COINS-images2bids/COINS_run_sheet_key.csv)
+    * --temp_json /Path/to/config.json (COINS-images2bids/config.json)
+    * --sub_dir /Path/to/subject/source/directory 
   * needed for input: 
     * COINS runsheet
     * keysheet (downloaded from github)
@@ -54,33 +54,77 @@ cmd : dcm2niix edf2asc
       * most common is 'subject not in source folder' - just indicates that your sub_dir did not contain diicom data for a particular subject, does not indicate malfunctioning code, does not cause a problem with the output produced from other subjects
   
 2) COINS-images2bids/batch_dcm2bids.py : converts scan diicoms to nifti, outputs in BIDS format
-  * --source /Path/to/subject/source/directory (or single subject directory)
-  * --destination /Path/to/bids/folder 
-  * --COINS_BIDS /Path/to/selected_scans.csv (step 1 output)
+  * arguments
+    * --source /Path/to/subject/source/directory (or single subject directory)
+    * --destination /Path/to/bids/folder 
+    * --COINS_BIDS /Path/to/selected_scans.csv (step 1 output)
+  * needed for input
+    * selected_scans.csv (step one output)
+    * a folder containing diicom data
+    * a destination folder for the sorted bids data (if you give a path in --destination that does not already exist, it will be created)
+  * output
+    * destination - contains scan data organized in bids format (note: at this stage, participants with multiple sessions, e.g. sub-80084 and sub-80084b, are treated as separate subjects. They will be combined in a later step.)
+    * source/error_log.txt - a text file listing any subjects from the COINS sheet that did not compile correctly
+      * most common is 'subject not in source folder' - just indicates that your sub_dir did not contain diicom data for a particular subject, does not indicate malfunctioning code, does not cause a problem with the output produced from other subjects
+      * this information is appended to the error log from step 1 - if a participant threw an error in step 1, they will appear a second time in this step
   
 3) COINS2physio/COINS_physio.py : generates jsons for physio processing
-  * --runsheet /Path/to/selectedphysio.csv (step 1 output)
-  * --input_dir /Path/to/source/directory
-  * --temp_json /Path/to/physio-template.json (COINS2physio/physio-template.json)
+  * arguments
+    * --runsheet /Path/to/selectedphysio.csv (step 1 output)
+    * --input_dir /Path/to/source/directory
+    * --temp_json /Path/to/physio-template.json (COINS2physio/physio-template.json)
+  * needed for input
+    * selectedphysio.csv - produced in step 1
+    * folder containing diicom data
+    * COINS2physio/physio-template.json - downloaded from github
+  * output
+    * input_dir/physio-templates - a folder containing a json that details the file names for the good physio runs for each participant
+    * COINS2physio/errorlog.txt - a list of subjects whose physio data did not compile/QC correctly. 
+      * This is distinct from the error_log.txt in steps 1 and 2. Information does not append to the original error log, and this error log is located in the code source folder.
   
 4) proc-biopac-COINS/proc_biopac_coins.py : process and QC physio data
-  --project_directory /Path/to/source/directory
-  --subject_list /Path/to/list/of/subjects/to/process
-  --template_directory /Path/to/template/directory (step 3 output)
-  -bids_dir /Path/to/BIDS/directory
+  * arguments
+    * --project_directory /Path/to/source/directory
+    * --subject_list /Path/to/list/of/subjects/to/process
+    * --template_directory /Path/to/template/directory (step 3 output)
+    * --bids_dir /Path/to/BIDS/directory
+  * needed for input
+    * folder with diicom data (esp. 01+physio)
+    * a list of subjects to process (.txt file, formatted 'sub-80084', one subject per line)
+    * folder with physio jsons for each subject (output from step 3)
+    * a destination folder for bids output (should be the same as given in step 2)
+  * output
+    * project_directory/[sub_ID]/QC/physio - a directory for each subject containing physio QC information and images
+    * bids_dir/[sub_ID]/func/[].tsv - a .tsv file with the time course of the physio data, in bids format
+    * project_directory/physio_values.csv - a list of relevant physio values extracted from the data (including heart rate, respiration rate, etc)
 
 5) COINS2tracking/COINS_tracking.py : generates jsons for tracking data
-  --runsheet /Path/to/selected_track.csv (step 1 output)
-  --input_dir /Path/to/source/directory
-  --temp_json /Path/to/tracking-template.json (COINS2tracking/tracking-template.json)
-
-**Ensure that .edf files are in 01+eyeTracking within the diicom structure and not in a zipped file
+  * arguments
+    * --runsheet /Path/to/selected_track.csv (step 1 output)
+    * --input_dir /Path/to/source/directory
+    * --temp_json /Path/to/tracking-template.json (COINS2tracking/tracking-template.json)
+  * needed for input
+    * selected_track.csv (output from step 1)
+    * folder with diicom data
+    * COINS2tracking/tracking-template.json - downloaded from github
+  * output
+    * input_dir/tracking-templates - folder with json containing file names for good eye tracking runs for each subject
+    * COINS2tracking/error_log.txt - list of subjects whose eye tracking data fails to compile
 
 6) proc-tracking-COINS/proc-tracking-COINS.py : processes and QCs eye tracking
-  --project_directory /Path/to/source/directory
-  --subject_list /Path/to/list/of/subjects/to/run
-  --template_directory /Path/to/template/directory (step 5 output)
-  -bids_dir /Path/to/BIDS/directory
+  * arguments
+    * --project_directory /Path/to/source/directory
+    * --subject_list /Path/to/list/of/subjects/to/run
+    * --template_directory /Path/to/template/directory (step 5 output)
+    * --bids_dir /Path/to/BIDS/directory
+  * needed for input
+    * folder with diicom data
+    * list of subjects to process (.txt file, formatted 'sub-80084', one subject per line)
+    * folder with jsons containing file names for good eye tracking runs (step 5 output)
+    * bids formatted destination folder (should be same as given in step 4 and step 2)
+  * output
+    * project_directory/[subid]/QC/eyetracking - folder containing QC info and images for eye tracking data
+    * bids_dir/[subid]/func/[].tsv - .tsv file with time series for eye tracking data
   
 7) eprime-codes/batch_ce.py : generates csv files from eprime output
   EITHER

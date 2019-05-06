@@ -45,7 +45,7 @@ parser.add_argument('-sublist', '--subject_list',
 parser.add_argument('-templates', '--template_directory', 
                     help='Directory for tracking templates; defaults to "tracking_templates" in project dir', 
                     default='tracking_templates')
-parser.add_argument('-bids_dir', help='BIDs directory', required=True)
+parser.add_argument('--bids_dir', help='BIDs directory', required=True)
 
 args = parser.parse_args()
 
