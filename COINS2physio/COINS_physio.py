@@ -27,7 +27,7 @@ basePath=os.getcwd()
 
 parser=MyParser(prog="COINS_physio")
 parser.add_argument("-rs","--runsheet",dest="runsheet",required=True)
-parser.add_argument("-idir","--input_dir",dest="input_dir",required=True)
+parser.add_argument("-idir","--source_dir",dest="input_dir",required=True)
 parser.add_argument("-tj","--temp_json",dest="temp_json")
 
 

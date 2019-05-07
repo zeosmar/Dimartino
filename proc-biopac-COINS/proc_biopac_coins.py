@@ -18,7 +18,7 @@ class MyParser(argparse.ArgumentParser):
         sys.exit(2)
         
 parser = MyParser(prog="proc_biopac_coins")
-parser.add_argument('-project','--project_directory', help="The project folder containing sourceData, etc. (Required)", required=True)
+parser.add_argument('-project','--source_dir', help="The project folder containing sourceData, etc. (Required)", required=True, dest='project_directory')
 parser.add_argument("-sublist", "--subject_list", help="File name listing subjects to process; defaults to 'subject_list.txt' in the working directory.", default='subject_list.txt')
 parser.add_argument("-templates", "--template_directory", help="Directory for physio templates; defaults to 'physio_templates' in project dir", default='physio_templates')
 parser.add_argument('--bids_dir', help='BIDs directory', required=True)

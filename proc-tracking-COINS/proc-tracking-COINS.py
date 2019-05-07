@@ -37,8 +37,8 @@ class MyParser(argparse.ArgumentParser):
         
 parser = MyParser(prog='eyetracking processing')
 
-parser.add_argument('-project', '--project_directory', 
-                    help='The project folder containing sourceData, etc. (Required)', required=True)
+parser.add_argument('-project', '--source_dir', 
+                    help='The project folder containing sourceData, etc. (Required)', required=True, dest='project_directory')
 parser.add_argument('-sublist', '--subject_list', 
                     help='File name listing subjects to process; defaults to "subject_list.txt" in the working directory.',
                     default='subject_list.txt')

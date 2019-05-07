@@ -16,8 +16,8 @@ ntplusp=7
 
 #accept input at the command window and store the data if argument passed
 parser=OptionParser()
-parser.add_option("--input_dir", dest = "input_dir")
-parser.add_option("--output_dir", dest = "output_dir")
+parser.add_option("--source_dir", dest = "input_dir")
+parser.add_option("--bids_dir", dest = "output_dir")
 parser.add_option("--subID", dest = "subID")
 (options, args)=parser.parse_args()
 

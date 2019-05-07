@@ -26,9 +26,9 @@ def gracefulExit():
     exit(2)
 
 parser = MyParser(prog="Convert .csv files into feat 3 column format")
-parser.add_argument('-input_dir','--input_dir',help="The input directory path which contains the .csv files")
+parser.add_argument('-input_dir','--source_dir',help="The input directory path which contains the .csv files", dest = 'input_dir')
 parser.add_argument('-subjectID','--subjectID',help="Enter the single subject ID for which you need the feat onset vectors")
-parser.add_argument('-output_dir','--output_dir',help="Enter the output directory for the feat subject files")
+parser.add_argument('-output_dir','--bids_dir',help="Enter the output directory for the feat subject files", dest = 'output_dir')
 
 args=parser.parse_args()
 

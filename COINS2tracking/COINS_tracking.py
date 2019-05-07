@@ -26,7 +26,7 @@ basePath=os.getcwd()
 
 parser=MyParser(prog='COINS_tracking')
 parser.add_argument('-rs','--runsheet',dest='runsheet',required=True)
-parser.add_argument('-idir','--input_dir',dest='input_dir',required=True)
+parser.add_argument('-idir','--source_dir',dest='input_dir',required=True)
 parser.add_argument('-tj','--temp_json',dest='temp_json')
 
 if len(sys.argv)==1:

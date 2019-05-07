@@ -27,8 +27,8 @@ def gracefulExit():
 basePath=os.getcwd()
 
 parser=MyParser(prog="DCM2BIDS")
-parser.add_argument("--source",dest="source")
-parser.add_argument("--destination",dest="destination")
+parser.add_argument("--source_dir",dest="source")
+parser.add_argument("--bids_dir",dest="destination")
 parser.add_argument("--COINS_BIDS",dest="COINS_BIDS")
 
 if len(sys.argv)==1:

@@ -25,7 +25,7 @@ def gracefulExit():
     
 #Accept input at command line window
 parser = MyParser(prog="Convert eprime .txt to .csv")
-parser.add_argument('-path','--path',help="input directory with subject folders having eprime data")
+parser.add_argument('-path','--source_dir',help="input directory with subject folders having eprime data", dest = 'path')
 parser.add_argument('-subID','--subjectID',help="The subject ID whose eprime .txt file is to be converted to .csv")
 
 #check if required number of arguments have been passed

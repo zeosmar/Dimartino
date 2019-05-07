@@ -17,7 +17,7 @@ class MyParser(argparse.ArgumentParser):
         sys.exit(2)
         
 parser=MyParser(prog="COINS_BIDS")
-parser.add_argument("--inputdir",dest="inputdir", required=True, help='BIDS input path')
+parser.add_argument("--bids_dir",dest="inputdir", required=True, help='BIDS input path')
 
 args=parser.parse_args()
 
