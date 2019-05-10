@@ -69,6 +69,7 @@ if args.subjectID:
 
 elif args.path:
     direc=args.path
+    error_folder = direc
     path=os.chdir(direc)
     cmd="ls | grep sub- > eprime_subject_list.txt" ######## Subject folders must start with a sub- , can modify !!! ####################
     os.system(cmd)
@@ -91,7 +92,10 @@ elif args.path:
                     os.makedirs(direc +"/"+ f+"/eprime_csvfiles") ######## Subject folders must start with a sub- , can modify !!!
                 ce.text_to_csv(f1, out_file)
         except:
-            print('Error: could not find eprime data folder in diicom structure') #change this so outputs list of errors to an error file
+            print('Error loading {}'.format(f))
+            fi = open(error_folder + '/error_log.txt', 'a')
+            fi.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'batch_ce', f, 'load error'))
+            fi.close()
         
         
         

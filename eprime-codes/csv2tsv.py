@@ -145,7 +145,8 @@ if options.subID:
                 csvpath=path                            
         else:
             path=head
-            csvpath=head            
+            csvpath=head   
+        error_folder = csvpath         
         csv_list=extension_tsv(csvpath,tail,newpath)
         try:
             for f2 in open(csvpath+"/"+tail+"/eprime_csvfiles/csv_list.txt","r"):
@@ -158,20 +159,27 @@ if options.subID:
                 name = name[-1]
                 name2 = name[:5]
                 
-                if not os.path.exists(newpath+"/"+ 'sub-' +name +"/func"): ##### Modify with required naming convention ###################
-                    os.makedirs(newpath+"/"+ 'sub-' +name +"/func") ##### Modify with required naming convention ###################
+                if not os.path.exists(newpath+"/"+ 'sub-' +name +"/func"): 
+                    os.makedirs(newpath+"/"+ 'sub-' +name +"/func") 
                 df.to_csv(newpath+"/"+'sub-' +name+'/func/sub-'+name2+'_task-faces_run-0'+str(num)+'_events.tsv',header=True, sep='\t',mode='w',index=False)
-                ##### Modify with required naming convention ###################
+                
             os.remove(csvpath+"/"+f+"/eprime_csvfiles/csv_list.txt")
         except IOError:
-            print IOError
+            print('Error loading {}'.format(f))
+            fi = open(error_folder + '/error_log.txt', 'a')
+            fi.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'csv2tsv', f, 'load error'))
+            fi.close()
     except IOError:
-        print IOError
+        print('Error loading {}'.format(f))
+        fi = open(error_folder + '/error_log.txt', 'a')
+        fi.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'csv2tsv', f, 'load error'))
+        fi.close()
 
 else:
-    cmd="ls "+csvpath+" | grep sub- > " + csvpath+ "/sub_list.txt" ##### Modify with required naming convention ###################
+    cmd="ls "+csvpath+" | grep sub- > " + csvpath+ "/sub_list.txt" 
     os.system(cmd)
-   
+    
+    error_folder = csvpath
     for f in open(csvpath+"/sub_list.txt",'r'):    
         f=f.strip("\n")
         try:
@@ -187,16 +195,15 @@ else:
                 name = name[-1]
                 name2 = name[:5]
                                        
-                if not os.path.exists(newpath+"/"+ 'sub-' +name +"/func"): ##### Modify with required naming convention ###################
-                    os.makedirs(newpath+"/"+ 'sub-' +name +"/func") ##### Modify with required naming convention ###################
+                if not os.path.exists(newpath+"/"+ 'sub-' +name +"/func"): 
+                    os.makedirs(newpath+"/"+ 'sub-' +name +"/func") 
                 df.to_csv(newpath+"/"+'sub-' +name+'/func/sub-'+name2+'_task-faces_run-0'+str(num)+'_events.tsv',header=True, sep='\t',mode='w',index=False)
-                ##### Modify with required naming convention ###################
+      
             os.remove(csvpath+"/"+f+"/eprime_csvfiles/csv_list.txt")
-        except IOError:
-            print('IO Error')
-            continue
-    #os.remove(csvpath+"/"+f+"/eprime_csvfiles/csv_list.txt")
-#os.remove(csvpath+"/sub_list.txt")
-        
-#sub-80037_task-faces_run-1.tsv
+        except:
+            print('Error loading {}'.format(f))
+            fi = open(error_folder + '/error_log.txt', 'a')
+            fi.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'csv2tsv', f, 'load error'))
+            fi.close()
+
     

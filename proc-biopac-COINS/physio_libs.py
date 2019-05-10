@@ -86,11 +86,13 @@ class PhysioObject():
         
     def load_from_template(self,infile):
         infile = path.abspath(path.expanduser(infile))
+        error_folder = infile.split('/'
+        error_folder = '/'.join(error_folder[:-2])
         if path.isfile(infile):
             with open(infile) as json_data:
                 d = json.load(json_data)
             for task in self.tasklist:
-                taskfile = path.abspath(path.expanduser(d[task])) #change how behaves when there's no task file
+                taskfile = path.abspath(path.expanduser(d[task]))
                 if d[task] != '' and path.isfile(taskfile):
                     print("loading: %s"%taskfile)
                     data = br.read_file(taskfile)
@@ -102,7 +104,7 @@ class PhysioObject():
                         self.run[task].pulse= pulse
                     except:
                         print('Error loading {}, {}'.format(self.subid, task))
-                        f = open('error_log.txt', 'a')
+                        f = open(error_folder + '/error_log.txt', 'a')
                         f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-biopac-coins', self.subid, 'load error'))
                         f.close()
                     try:
@@ -120,13 +122,13 @@ class PhysioObject():
                         self.run[task].rr = int(len(self.run[task].rr_idx) / ((len(self.run[task].resp)/self.target_sampling_rate)/60.0))
                     except IOError:
                         print('Error processing {}, {}'.format(self.subid, task))
-                        f = open('error_log.txt', 'a')
+                        f = open(error_folder + '/error_log.txt', 'a')
                         f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-biopac-coins', self.subid, 'processing error'))
                         f.close()
             self.hasloaded = True
         else:
             print('There is no json file for this subject') 
-            f = open('error_log.txt', 'a')
+            f = open(error_folder + '/error_log.txt', 'a')
             f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-biopac-coins', self.subid, 'no json file'))
             f.close()
 

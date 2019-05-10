@@ -7,11 +7,7 @@ Created on Wed Dec 12 12:28:38 2018
 """
 # In[Info]
 
-"""
 
--how to import information about screen resolution? any way of acquiring that?
-
-"""
 # In[Import]:
 
 import os
@@ -521,6 +517,8 @@ class TrackObject:
         
     def load_from_template(self, infile):
         infile = os.path.abspath(os.path.expanduser(infile))
+        error_folder = infile.split('/'
+        error_folder = '/'.join(error_folder[:-2])
         try:
 
             with open(infile) as json_data:
@@ -528,35 +526,47 @@ class TrackObject:
             for task in self.tasklist:
                 taskfile = os.path.abspath(os.path.expanduser(d[task]))
                 if os.path.isfile(taskfile) and d[task] != '':
-                    print('loading: {}'.format(taskfile))
-                    data = self.parse_asc(taskfile)
-                    gazex, gazey, pupil, time, samprate = self.get_data(data)
-                    self.run[task].gazex = gazex
-                    self.run[task].gazey = gazey
-                    self.run[task].pupil = pupil
-                    self.run[task].time = time
-                    self.run[task].org_start = time[0]
-                    self.run[task].org_end = time[-1]
-                    self.run[task].sampling_rate = samprate
-                    print('Processing: {}, {}'.format(self.subid, task))
-                    self.native_sampling_rate = samprate
-                    self.run[task] = downsample(self.run[task], 4)
-                    print('Blink Detection: ...')
-                    self.run[task] = invalid(self.run[task])
-                    self.run[task] = dilationspeed(self.run[task])
-                    print('Blink Correction: ...')
-                    self.run[task] = trendline(self.run[task])
-                    print('Normalizing Pupil: ...')
-                    self.run[task] = normalize(self.run[task])
-                    print('Downsampling: ...')
-                    self.run[task] = flipy(self.run[task])
-                    self.run[task] = downsample(self.run[task], 800)
-                    self.run[task].qc()
+                    try:
+                        print('loading: {}'.format(taskfile))
+                        data = self.parse_asc(taskfile)
+                        gazex, gazey, pupil, time, samprate = self.get_data(data)
+                    except:
+                        print('Error loading {}, {}'.format(self.subid, task))
+                        f = open(error_folder + '/error_log.txt', 'a')
+                        f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-tracking-coins', self.subid, 'load error'))
+                        f.close()
+                    try:
+                        self.run[task].gazex = gazex
+                        self.run[task].gazey = gazey
+                        self.run[task].pupil = pupil
+                        self.run[task].time = time
+                        self.run[task].org_start = time[0]
+                        self.run[task].org_end = time[-1]
+                        self.run[task].sampling_rate = samprate
+                        print('Processing: {}, {}'.format(self.subid, task))
+                        self.native_sampling_rate = samprate
+                        self.run[task] = downsample(self.run[task], 4)
+                        print('Blink Detection: ...')
+                        self.run[task] = invalid(self.run[task])
+                        self.run[task] = dilationspeed(self.run[task])
+                        print('Blink Correction: ...')
+                        self.run[task] = trendline(self.run[task])
+                        print('Normalizing Pupil: ...')
+                        self.run[task] = normalize(self.run[task])
+                        print('Downsampling: ...')
+                        self.run[task] = flipy(self.run[task])
+                        self.run[task] = downsample(self.run[task], 800)
+                        self.run[task].qc()
+                    except:
+                        print('Error loading {}, {}'.format(self.subid, task))
+                        f = open(error_folder + '/error_log.txt', 'a')
+                        f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-tracking-coins', self.subid, 'processing error'))
+                        f.close()
                 elif not os.path.isfile(taskfile) and d[task] != '':
-                    ostr = """-------------\nWarning!\n {} does not exist.\n
-                    No tracking TSV file will be cretaed for {}, {}.\n-------------"""
-                    print(ostr.format(taskfile, self.subid, task))
-                    self.write_to_missing(taskfile, task)
+                    print('Error loading {}, {}'.format(self.subid, task))
+                    f = open(error_folder + '/error_log.txt', 'a')
+                    f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-tracking-coins', self.subid, 'no json file'))
+                    f.close()
             self.hasloaded=True
         except IOError:
             print('No file: {}'.format(infile))
