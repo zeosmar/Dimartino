@@ -86,7 +86,7 @@ class PhysioObject():
         
     def load_from_template(self,infile):
         infile = path.abspath(path.expanduser(infile))
-        error_folder = infile.split('/'
+        error_folder = infile.split('/')
         error_folder = '/'.join(error_folder[:-2])
         if path.isfile(infile):
             with open(infile) as json_data:
@@ -124,6 +124,11 @@ class PhysioObject():
                         print('Error processing {}, {}'.format(self.subid, task))
                         f = open(error_folder + '/error_log.txt', 'a')
                         f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-biopac-coins', self.subid, 'processing error'))
+                        f.close()
+                    except ValueError:
+                        print('Error processing {}, {}'.format(self.subid, task))
+                        f = open(error_folder + '/error_log.txt', 'a')
+                        f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-biopac-coins', self.subid, 'processing error - channel missing data'))
                         f.close()
             self.hasloaded = True
         else:
@@ -208,7 +213,7 @@ def save_physio_csv(physio_data, output_dir):
 
 def save_physio_tsv(physio_data, output_dir):
     tasklist = physio_data.tasklist
-    subid = physio_data.subid[:9]
+    subid = physio_data.subid
     subid2 = physio_data.subid
     tsv_name = {}
     tsv_name['rest1'] = subid+'_task-rest_run-01_physio'

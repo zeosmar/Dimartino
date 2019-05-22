@@ -14,6 +14,7 @@ import pandas as pd
 import io
 import numpy as np
 import argparse
+import datetime
 
 class MyParser(argparse.ArgumentParser):
     def error(self,message):
@@ -26,9 +27,9 @@ def gracefulExit():
     exit(2)
 
 parser = MyParser(prog="Convert .csv files into feat 3 column format")
-parser.add_argument('-input_dir','--source_dir',help="The input directory path which contains the .csv files", dest = 'input_dir')
-parser.add_argument('-subjectID','--subjectID',help="Enter the single subject ID for which you need the feat onset vectors")
-parser.add_argument('-output_dir','--bids_dir',help="Enter the output directory for the feat subject files", dest = 'output_dir')
+parser.add_argument('-input_dir','--source_dir',help="The input directory path which contains the .csv files", dest = 'input_dir', required=True)
+parser.add_argument('-output_dir','--bids_dir',help="Enter the output directory for the feat subject files", dest = 'output_dir', required=True)
+parser.add_argument('--subject_list', required=True, help='list of subjects to process', dest = 'subject_list')
 
 args=parser.parse_args()
 
@@ -36,11 +37,76 @@ if args.input_dir:
     direc=args.input_dir    
 if args.output_dir:
     newpath=args.output_dir
-if args.subjectID:
-    subID=args.subjectID
+if args.subject_list:
+    f = open(args.subject_list)
+    subject_list = f.read().splitlines()
+    f.close()
+
+def feat_creation_two(csvpath, outputpath, f1):
+    error_folder = csvpath
+    task_list = ['task-faces_run-01', 'task-faces_run-02']
+
+    for task in task_list:
+        try:
+            event_file = f1 + '_' + task + '_events.tsv'
+            event_folder = os.path.join(outputpath, f1, 'func', event_file)
+
+            event_data = pd.read_csv(event_folder, sep='\t')
+        except IOError:
+            print('Error loading {}'.format(f1))
+            fi = open(error_folder + '/error_log.txt', 'a')
+            fi.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'feat_excel', f, 'no tsv file found'))
+            fi.close()
+            continue
+        
+        all_shape = event_data[event_data['procedure'] == 'Shape']
+        all_face = event_data[event_data['procedure'] == 'Face']
+
+        acc_shape = event_data[np.logical_and(event_data['procedure'] == 'Shape', event_data['accuracy'] == 1)]
+        inacc_shape = event_data[np.logical_and(event_data['procedure'] == 'Shape', event_data['accuracy'] == 0)]
+        acc_face = event_data[np.logical_and(event_data['procedure'] == 'Face', event_data['accuracy'] == 1)]
+        inacc_face = event_data[np.logical_and(event_data['procedure'] == 'Face', event_data['accuracy'] == 0)]
+
+        event_data = event_data[['onset', 'duration', 'procedure']]
+        for x in range(len(event_data)):
+            if event_data['procedure'][x] == 'Shape':
+                event_data.loc[x, 'procedure'] = 0
+            else:
+                event_data.loc[x, 'procedure'] = 1
+
+        outpath = os.path.join(outputpath, f1, 'feat')
+        if not os.path.exists(outpath):
+            os.mkdir(outpath)
+        
+        ones = np.ones(len(all_shape))
+        all_shape['procedure'] = ones
+        all_shape.to_csv(outpath + '/' + f1 + '_' + task + '_shapes.txt', sep='\t', columns=['onset', 'duration', 'procedure'], index=None, header=None)
+
+        ones = np.ones(len(all_face))
+        all_face['procedure'] = ones
+        all_face.to_csv(outpath + '/' + f1 + '_' + task + '_faces.txt', sep='\t', columns=['onset', 'duration', 'procedure'], index=None, header=None)
+
+        ones = np.ones(len(acc_shape))
+        acc_shape['procedure'] = ones
+        acc_shape.to_csv(outpath + '/' + f1 + '_' + task + '_shapes-correct.txt', sep='\t', columns=['onset', 'duration', 'procedure'], index=None, header=None)
+
+        ones = np.ones(len(inacc_shape))
+        inacc_shape['procedure'] = ones
+        inacc_shape.to_csv(outpath + '/' + f1 + '_' + task + '_shapes-incorrect.txt', sep='\t', columns=['onset', 'duration', 'procedure'], index=None, header=None)
+
+        ones = np.ones(len(acc_face))
+        acc_face['procedure'] = ones
+        acc_face.to_csv(outpath + '/' + f1 + '_' + task + '_faces-correct.txt', sep='\t', columns=['onset', 'duration', 'procedure'], index=None, header=None)
+
+        ones = np.ones(len(inacc_face))
+        inacc_face['procedure'] = ones
+        inacc_face.to_csv(outpath + '/' + f1 + '_' + task + '_faces-incorrect.txt', sep='\t', columns=['onset', 'duration', 'procedure'], index=None, header=None)
+
+        event_data.to_csv(outpath + '/' + f1 + '_' + task + '_all.txt', sep='\t', index=None, header=None)
 
 def feat_creation(csvpath,f1):
     try:
+        error_folder = csvpath
         cmd="ls "+ csvpath + "/"+f1+ "/eprime_csvfiles"+"/*.csv > " +csvpath + "/" + f1 + "/eprime_csvfiles/csvfilelist.txt"
         os.system(cmd)
         
@@ -281,22 +347,22 @@ def feat_creation(csvpath,f1):
                 if run_count==1:
                     face_accuracy_p1=round((float(acc_c_face)/f_c)*100,3)                                    
                     shape_accuracy_p1=round((float(acc_c_shape)/s_c)*100,3)
-            ####overall accuracy####
+
                     total_shape_face_p1=f_c+s_c
                     total_acc_p1=acc_c_face+acc_c_shape
                     overall_acc_p1=round((float(total_acc_p1)/total_shape_face_p1)*100,3)
-            ########################
+
                     face_rt_avg1=round((float(f_rt)/f_c),3)
                     shape_rt_avg1=round((float(s_rt)/s_c),3)
                     
                 else:
                     face_accuracy_p2=round((float(acc_c_face)/f_c)*100,3)
                     shape_accuracy_p2=round((float(acc_c_shape)/s_c)*100,3)
-            ####overall accuracy####
+
                     total_shape_face_p2=f_c+s_c
                     total_acc_p2=acc_c_face+acc_c_shape
                     overall_acc_p2=round((float(total_acc_p2)/total_shape_face_p2)*100,3)
-            ########################
+
                     face_rt_avg2=round((float(f_rt)/f_c),3)
                     shape_rt_avg2=round((float(s_rt)/s_c),3)
                     
@@ -305,51 +371,29 @@ def feat_creation(csvpath,f1):
             acc_f.close()
             os.remove(csvpath+"/"+f1+"/eprime_csvfiles/csvfilelist.txt")
         else:
-            print f1 + ": no csv files for this subject \n"
-    except IOError:
-        print IOError
+            print('Error loading {}'.format(f1))
+            fi = open(error_folder + '/error_log.txt', 'a')
+            fi.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'feat_excel', f1, 'no csv files for this subject'))
+            fi.close()
+    except:
+        print('Error loading {}'.format(f1))
+        fi = open(error_folder + '/error_log.txt', 'a')
+        fi.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'feat_excel', f1, 'load error'))
+        fi.close()
 
-if args.subjectID:
-    subID=args.subjectID
-    head, tail = os.path.split(subID)
-    if head=="":
-        if args.input_dir:
-            head=args.input_dir
-        else:
-            head=os.getcwd()
-    os.chdir(newpath)
-    path=os.getcwd()
-    if os.path.isfile(path+"/"+"subj_acc.txt")!=True:        
-        acc_f=open(path+"/"+"subj_acc.txt","a")
-        acc_f.write("SubjectID \t Reaction_Time " + " \t \t \t \t \t %_Accuracy" +  "\t \t \t \t %_Overall Accuracy \n")
-        acc_f.write("\t Run_1 \t \t Run_2" + "\t \t \t Run_1 \t \t Run_2 \n")
-        acc_f.write("\t Face \t Shape  " + " \t Face \t Shape \t \t Face \t Shape \t Face \t Shape "+ "\t \t Run_1 \t Run_2 \n")
-        acc_f.close()      
-    csvpath=head
-    direc=head
-    f1=tail    
-    feat_creation(csvpath,f1)
-else:
-    #path to participant .csv files
-    os.chdir(newpath)
-    path=os.getcwd()    
-    csvpath=direc
-    if os.path.isfile(path+"/"+"subj_acc.txt")!=True:        
-        acc_f=open(path+"/"+"subj_acc.txt","a")
-        acc_f.write("SubjectID \t Reaction_Time \t " +  "\t \t \t \t %_Accuracy" +  " \t \t \t \t \t %_Overall Accuracy \n")
-        acc_f.write("\t Run_1 \t \t Run_2" + "\t  \t \t Run_1 \t \t Run_2 \n")
-        acc_f.write(" \t Face \t Shape " + " \t Face \t Shape \t \t Face \t Shape \t Face \t Shape "+ "\t \t Run_1 \t Run_2 \n")
-        acc_f.close()             
-    for f1 in open(csvpath+"/sub_list.txt"):
-        f1=f1.strip("\n")
-        feat_creation(csvpath,f1)
-        #os.remove(csvpath+"/"+f1+"/eprime_csvfiles/csvfilelist.txt")
-        
-        
-        
-        
-        
 
-                   
-    
-#sub-80037_task-faces_run-1.tsv
+os.chdir(newpath)
+path=os.getcwd()    
+csvpath=direc
+if os.path.isfile(path+"/"+"subj_acc.txt")!=True:        
+    acc_f=open(path+"/"+"subj_acc.txt","a")
+    acc_f.write("SubjectID \t Reaction_Time \t " +  "\t \t \t \t %_Accuracy" +  " \t \t \t \t \t %_Overall Accuracy \n")
+    acc_f.write("\t Run_1 \t \t Run_2" + "\t  \t \t Run_1 \t \t Run_2 \n")
+    acc_f.write(" \t Face \t Shape " + " \t Face \t Shape \t \t Face \t Shape \t Face \t Shape "+ "\t \t Run_1 \t Run_2 \n")
+    acc_f.close()             
+for f1 in subject_list:
+    f1=f1.strip("\n")
+    #feat_creation(csvpath,f1)
+    feat_creation_two(csvpath, newpath, f1)
+
+

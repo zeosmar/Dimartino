@@ -27,7 +27,8 @@ basePath=os.getcwd()
 parser=MyParser(prog='COINS_tracking')
 parser.add_argument('-rs','--runsheet',dest='runsheet',required=True)
 parser.add_argument('-idir','--source_dir',dest='input_dir',required=True)
-parser.add_argument('-tj','--temp_json',dest='temp_json')
+parser.add_argument('-tj','--temp_json',dest='temp_json', required=True)
+parser.add_argument('--subject_list', dest='subject_list', required=True)
 
 if len(sys.argv)==1:
     parser.print_help()
@@ -42,6 +43,11 @@ if args.runsheet:
         
     fullpathr = os.path.join(headr,tailr)
     runsheet = pd.read_csv(fullpathr)
+
+if args.subject_list:
+    f = open(args.subject_list)
+    subject_list = f.read().splitlines()
+    f.close()
 
 if args.input_dir:
     input_dir = args.input_dir
@@ -68,11 +74,11 @@ for index, row in runsheet.iterrows():
         
     for i in list(runsheet.columns):
         subid = row['Scan_Subject_ID']
-        if i[-1].isdigit():
+        if i[-1].isdigit() and 'sub-' + subid in subject_list:
             if row[i] != '0':
                 json_file[i] = os.path.join(input_dir, 'sub-' +subid, 'originals', '01+eyeTracker', row[i]+'.edf')
             else:
                 json_file[i] = ''
-            
-    with open(os.path.join(input_dir,"tracking_templates/sub-"+str(subid)+"_tracking-template.json"),"w") as fp:
-        json.dump(json_file,fp)
+    if 'sub-' + subid in subject_list:     
+        with open(os.path.join(input_dir,"tracking_templates/sub-"+str(subid)+"_tracking-template.json"),"w") as fp:
+            json.dump(json_file,fp)

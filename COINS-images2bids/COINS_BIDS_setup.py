@@ -39,6 +39,7 @@ parser.add_argument("--runsheet",dest="runsheet", required=True, help='Path to t
 parser.add_argument("--keysheet",dest="keysheet", required=True, help='Path to the COINS key sheet')
 parser.add_argument("--temp_json",dest="temp_json", required=True, help='Path to config.json')
 parser.add_argument("--source_dir",dest="input_path", required=True, help='Path to subject source directory or single subject folder')
+parser.add_argument('--subject_list', dest='subject_list', required=True, help='Path to subject list text file')
 
 #Checking if attempt has been made to pass arguments
 if len(sys.argv)==1:
@@ -63,15 +64,20 @@ if args.keysheet:
     
     fullpathk=os.path.join(headk,tailk)
     keysheet=pd.read_csv(fullpathk)
+
+if args.subject_list:
+    f = open(args.subject_list)
+    subject_list = f.read().splitlines()
+    f.close()
     
 scan_output_file = os.path.join(args.input_path, 'selected_scans.csv')
 physio_output_file = os.path.join(args.input_path, 'selected_physio.csv')
 tracker_output_file = os.path.join(args.input_path, 'selected_track.csv')
 
-scan3cols = [c for c in df.columns if 'Scan3' in c and '.1' not in c]
-scan2cols = [c for c in df.columns if 'Scan2' in c and '.1' not in c]
-scan1cols = [c for c in df.columns if ('Scan2' not in c and 'Scan3' not in c and 'scan' not in c and '.1' not in c)]
-remainingcols = [c for c in df.columns if 'Scan' not in c and '.1' not in c]
+scan3cols = [c for c in df.columns if 'Scan3' in c and '.1' not in c and '.2' not in c and 'Scan_2' not in c and '.3' not in c]
+scan2cols = [c for c in df.columns if 'Scan2' in c and '.1' not in c and '.2' not in c and 'Scan_2' not in c and '.3' not in c]
+scan1cols = [c for c in df.columns if ('Scan2' not in c and 'Scan3' not in c and 'scan' not in c and '.1' not in c and '.2' not in c and 'Scan_2' not in c and '.3' not in c)]
+remainingcols = [c for c in df.columns if ('Scan' not in c and '.1' not in c and '.2' not in c and 'Scan_2' not in c and '.3' not in c)]
 
 df1 = df[scan1cols]
 df1 = df1.replace('~<condSkipped>~', '?')
@@ -89,7 +95,10 @@ l3 = len(df3)
 for x in remainingcols:
     df2[x] = ['?'] * l2
     df3[x] = ['?'] * l3
-    
+
+cut = df1['Scan_Scan1_Sub_ID'] != '?'
+df1 = df1[cut]
+
 cut = df2['Scan_Scan2_Subject_ID'] != '?'
 df2 = df2[cut]
 
@@ -212,7 +221,9 @@ for i in range(physio_names_bool.shape[0]):
 #Store useful scans in list
 coins_bids= pd.DataFrame()
 for sub in range(1,len(runsheet)):
-    if runsheet['Scan_Subject_ID'][sub] != '?' and runsheet['Scan_Run_01'][sub] != '?':
+    subid = runsheet['Scan_Subject_ID'][sub]
+    subid2 = 'sub-' + subid
+    if subid != '?' and runsheet['Scan_Run_01'][sub] != '?' and subid2 in subject_list:
         success_list=np.array([])      
         for i in range(len(scan_name_indices)):
             success_list=np.append(success_list,runsheet.iloc[sub,int(scan_name_indices[i])])
@@ -279,7 +290,9 @@ for sub in range(1,len(runsheet)):
         
 physio_bids = pd.DataFrame()
 for sub in range(1,len(runsheet)):
-    if runsheet['Scan_Subject_ID'][sub] != '?' and runsheet['Scan_Run_01'][sub] != '?':
+    subid = runsheet['Scan_Subject_ID'][sub]
+    subid2 = 'sub-' + subid
+    if subid != '?' and runsheet['Scan_Run_01'][sub] != '?' and subid2 in subject_list:
         success_list=np.array([])
         for i in range(len(physio_name_indices)):
             success_list = np.append(success_list, runsheet.iloc[sub, int(physio_name_indices[i])])

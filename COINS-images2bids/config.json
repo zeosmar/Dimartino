@@ -28,7 +28,7 @@
         {
 	    "dataType": "func",
             "modalityLabel": "bold",
-            "customLabels": "task-rest",
+            "customLabels": "task-rest_run-02",
             "criteria": {
                 "SeriesDescription": "REST1",
 				"SeriesNumber": "SNum"
@@ -37,7 +37,7 @@
         {
 	    "dataType": "func",
             "modalityLabel": "bold",
-            "customLabels": "task-rest",
+            "customLabels": "task-rest_run-01",
             "criteria": {
                 "SeriesDescription": "REST2",
 				"SeriesNumber": "SNum"
@@ -46,7 +46,7 @@
         {
             "dataType": "func",
             "modalityLabel": "bold",
-            "customLabels": "task-faces",
+            "customLabels": "task-faces_run-01",
             "criteria": {
                 "SeriesDescription": "FACES1",
 				"SeriesNumber": "SNum"
@@ -55,7 +55,7 @@
         {
             "dataType": "func",
             "modalityLabel": "bold",
-            "customLabels": "task-faces",
+            "customLabels": "task-faces_run-02",
             "criteria": {
                 "SeriesDescription": "FACES2",
 				"SeriesNumber": "SNum"

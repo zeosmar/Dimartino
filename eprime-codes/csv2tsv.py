@@ -9,25 +9,32 @@ Created on Sun Jul 20 22:10:22 2017
 import sys
 import os
 import pandas as pd
-from optparse import OptionParser
+import argparse
+import datetime
+
+class MyParser(argparse.ArgumentParser):
+    def error(self,message):
+        sys.stderr.write('error: %s \n' % message)
+        self.print_help()
+        sys.exit(2)
 
 #number of trials per prompt including the prompt
 ntplusp=7 
 
 #accept input at the command window and store the data if argument passed
-parser=OptionParser()
-parser.add_option("--source_dir", dest = "input_dir")
-parser.add_option("--bids_dir", dest = "output_dir")
-parser.add_option("--subID", dest = "subID")
-(options, args)=parser.parse_args()
+parser = MyParser(prog="Convert eprime .csv to .tsv")
+parser.add_argument("--source_dir", dest = "input_dir", required = True, help='Directory with subject dicoms')
+parser.add_argument("--bids_dir", dest = "output_dir", required=True, help='Directory with bids organized data')
+parser.add_argument("--subject_list", dest = "runsheet", required=True, help='List of subjects')
+args=parser.parse_args()
 
-if options.input_dir:
-    csvpath=options.input_dir
+if args.input_dir:
+    csvpath=args.input_dir
     sys.path.append(csvpath)
-if options.output_dir:
-    newpath=options.output_dir
-if options.subID:
-    f=options.subID
+if args.output_dir:
+    newpath=args.output_dir
+if args.runsheet:
+    runsheet = args.runsheet
        
 path=os.getcwd()
 
@@ -49,7 +56,7 @@ def extension_tsv(csvpath,f,newpath):
 #Returns dataframe with columns required      
 def csv_df(f2):
     f2=f2.strip("\n")
-    ####### Can be modified according to the columns to be used for your task ##################################
+
     df = pd.read_csv(f2, usecols=['SyncSlide.OnsetTime','Procedure','ExperimenterWindow.OnsetTime','StimSlide.OnsetToOnsetTime','StimSlide.OnsetTime','StimSlide.RESP','StimSlide.ACC','StimSlide.CRESP','StimSlide.RT'])     
     csv1=f2.strip(".csv")
     head,tail=os.path.split(csv1)
@@ -130,57 +137,10 @@ def csv_df(f2):
     df=df.drop(df.index[len(df)-1])
 
     return df,tail   
-        
-#Check if subID input is given or the directory    
-if options.subID:
-    f=options.subID
-    try:        
-        head,tail=os.path.split(f) 
-        if head=='':
-            if options.input_dir:
-                csvpath=options.input_dir
-                path=csvpath
-            else:
-                path=os.getcwd()
-                csvpath=path                            
-        else:
-            path=head
-            csvpath=head   
-        error_folder = csvpath         
-        csv_list=extension_tsv(csvpath,tail,newpath)
-        try:
-            for f2 in open(csvpath+"/"+tail+"/eprime_csvfiles/csv_list.txt","r"):
-                f2=f2.strip("\n")                    
-                df,tail=csv_df(f2)
-                num=tail[-1]
-                tail1=tail.split('_')
-                name = tail1[0]
-                name = name.split('-')
-                name = name[-1]
-                name2 = name[:5]
-                
-                if not os.path.exists(newpath+"/"+ 'sub-' +name +"/func"): 
-                    os.makedirs(newpath+"/"+ 'sub-' +name +"/func") 
-                df.to_csv(newpath+"/"+'sub-' +name+'/func/sub-'+name2+'_task-faces_run-0'+str(num)+'_events.tsv',header=True, sep='\t',mode='w',index=False)
-                
-            os.remove(csvpath+"/"+f+"/eprime_csvfiles/csv_list.txt")
-        except IOError:
-            print('Error loading {}'.format(f))
-            fi = open(error_folder + '/error_log.txt', 'a')
-            fi.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'csv2tsv', f, 'load error'))
-            fi.close()
-    except IOError:
-        print('Error loading {}'.format(f))
-        fi = open(error_folder + '/error_log.txt', 'a')
-        fi.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'csv2tsv', f, 'load error'))
-        fi.close()
 
-else:
-    cmd="ls "+csvpath+" | grep sub- > " + csvpath+ "/sub_list.txt" 
-    os.system(cmd)
-    
+try:
     error_folder = csvpath
-    for f in open(csvpath+"/sub_list.txt",'r'):    
+    for f in open(runsheet,'r'):    
         f=f.strip("\n")
         try:
             csv_list=extension_tsv(csvpath,f,newpath)
@@ -195,9 +155,9 @@ else:
                 name = name[-1]
                 name2 = name[:5]
                                        
-                if not os.path.exists(newpath+"/"+ 'sub-' +name +"/func"): 
-                    os.makedirs(newpath+"/"+ 'sub-' +name +"/func") 
-                df.to_csv(newpath+"/"+'sub-' +name+'/func/sub-'+name2+'_task-faces_run-0'+str(num)+'_events.tsv',header=True, sep='\t',mode='w',index=False)
+                if not os.path.exists(newpath+"/"+ f +"/func"): 
+                    os.makedirs(newpath+"/"+f +"/func") 
+                df.to_csv(newpath+"/"+f+'/func/'+f+'_task-faces_run-0'+str(num)+'_events.tsv',header=True, sep='\t',mode='w',index=False)
       
             os.remove(csvpath+"/"+f+"/eprime_csvfiles/csv_list.txt")
         except:
@@ -205,5 +165,7 @@ else:
             fi = open(error_folder + '/error_log.txt', 'a')
             fi.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'csv2tsv', f, 'load error'))
             fi.close()
+except:
+    pass
 
     

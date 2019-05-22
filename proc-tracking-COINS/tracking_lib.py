@@ -17,6 +17,8 @@ from scipy import interpolate, signal
 import pandas as pd
 import datetime
 import json
+from scipy.ndimage.filters import gaussian_filter
+import matplotlib.cm as cm
 
 # In[TrackData]:
 
@@ -88,7 +90,7 @@ def dilationspeed(data):
     
     mad = np.median(madlist)
     
-    thresh = med + (2 * mad)
+    thresh = med + (.05 * mad)
     
     dilation_speed = np.array(dilation_speed)
     
@@ -172,17 +174,19 @@ def invalid(data):
     gazey = data.gazey[:]
     pupil = data.pupil[:]
     time = data.time[:]
+
+    res = data.res
     
     data.org_first = [gazex[0], gazey[0], pupil[0]]
     data.org_last = [gazex.iloc[-1], gazey.iloc[-1], pupil.iloc[-1]]
 
-    cuta = np.logical_and(gazex > 0, gazex < 1920 + 50)
+    cuta = np.logical_and(gazex > 40, gazex < res[0] - 40)
     gazex = gazex[cuta]
     gazey = gazey[cuta]
     pupil = pupil[cuta]
     time = time[cuta]
     
-    cutb = np.logical_and(gazey > 0, gazey < 1080 + 50)
+    cutb = np.logical_and(gazey > 40, gazey < res[1] - 80)
     gazex = gazex[cutb]
     gazey = gazey[cutb]
     pupil = pupil[cutb]
@@ -284,8 +288,8 @@ def trendline(data):
     inter_pupil = inter_func(inter_time)
     trend_pupil = inter_func2(inter_time)
     
-    pos_limit = trend_pupil + (.5 * mad)
-    neg_limit = trend_pupil - (.5 * mad)
+    pos_limit = trend_pupil + (.1 * mad)
+    neg_limit = trend_pupil - (.1 * mad)
     
     cutd = inter_pupil > neg_limit
     cute = inter_pupil < pos_limit
@@ -299,7 +303,7 @@ def trendline(data):
     blink_count = 0
     t = 0
     for i in range(pupil.size):
-        if time[i] - t >= 300 and time[i] - t <= 1250:
+        if time[i] - t >= 300 and time[i] - t <= 500:
             blink_count += 1
             t = time[i]
         else:
@@ -344,6 +348,35 @@ def downsample(data, rate):
     
     return data
 
+def shift_to_center(data):
+    
+    gazex = data.gazex[:]
+    gazey = data.gazey[:]
+
+    res = data.res
+
+    cut = np.logical_and(gazey > res[1] * .35, gazey < res[1])
+    gazex_small = gazex[cut]
+    gazey_small = gazey[cut]
+    
+    mean_x = gazex_small.mean()
+    mean_y = gazey_small.mean()
+    
+    resx = res[0]/2
+    resy = res[1]/2
+    
+    movex = resx - mean_x
+    movey = resy - mean_y
+    
+    gazex = gazex + movex
+    gazey = gazey + movey
+    
+    data.gazex = gazex
+    data.gazey = gazey
+    
+    return data, (movex, movey)
+    
+
 def cuttostart():
     pass
 
@@ -370,7 +403,7 @@ class TrackData:
         self.name = ''
 
     
-    def qc(self):
+    def qc(self, bids_dir, name, displace):
         
         res = self.res
         
@@ -378,7 +411,7 @@ class TrackData:
         r_c = [(res[0] * .7), (res[1] * .64)]
         c_c = [(res[0] * .5), (res[1] * .33)]
         
-        c = res[1] / 2
+        c = res[1]/2
         
         l_c[1] = c - l_c[1]
         l_c[1] = c + l_c[1]
@@ -389,25 +422,23 @@ class TrackData:
         c_c[1] = c - c_c[1]
         c_c[1] = c + c_c[1]
         
-        x = 195/2
-        y = 240/2
+        x = (195 * 1.875) /2
+        y = (240 * 1.406) /2
         
-        #ROI LEFT
+        #ROI Locations
         l_x = [l_c[0]+x, l_c[0]+x, l_c[0]-x, l_c[0]-x, l_c[0]+x]
         l_y = [l_c[1]-y, l_c[1]+y, l_c[1]+y, l_c[1]-y, l_c[1]-y]
         
-        #ROI_RIGHT
         r_x = [r_c[0]+x, r_c[0]+x, r_c[0]-x, r_c[0]-x, r_c[0]+x]
         r_y = [r_c[1]-y, r_c[1]+y, r_c[1]+y, r_c[1]-y, r_c[1]-y]
         
-        #ROI_CENTER
         c_x = [c_c[0]+x, c_c[0]+x, c_c[0]-x, c_c[0]-x, c_c[0]+x]
         c_y = [c_c[1]-y, c_c[1]+y, c_c[1]+y, c_c[1]-y, c_c[1]-y]
         
-        #ROI FIX
         f_x = [(res[0] / 2)+30, (res[0] / 2)+30, (res[0] / 2)-30, (res[0] / 2)-30, (res[0] / 2)+30]
         f_y = [(res[1] / 2)-50, (res[1] / 2)+20, (res[1] / 2)+20, (res[1] / 2)-50, (res[1] / 2)-50]
 
+        res = (1920, 1080)
         gazex = self.gazex
         gazey = self.gazey
         pupil = self.pupil
@@ -415,26 +446,39 @@ class TrackData:
         
         total = float(gazex.size)
 
-        cut_l_y = np.logical_and(gazey > np.min(l_y), gazey < np.max(l_y))
-        cut_l_x = np.logical_and(gazex > np.min(l_x), gazex < np.max(l_x))
+        #Create heatmap
+
+        fig, ax = plt.subplots()
+                
+        center_x = gazex
+        center_y = gazey
+
+        area = np.max(np.absolute(displace))
+        area = int(area / 11)**2
+
+        plt.scatter(center_x, center_y, s=area, c = time, alpha=.5)
+        plt.scatter(center_x, center_y, c = time)
+
+        cut_l_y = np.logical_and(center_y > np.min(l_y), center_y < np.max(l_y))
+        cut_l_x = np.logical_and(center_x > np.min(l_x), center_x < np.max(l_x))
         cut_l = np.logical_and(cut_l_y, cut_l_x)
         
-        cut_r_y = np.logical_and(gazey > np.min(r_y), gazey < np.max(r_y))
-        cut_r_x = np.logical_and(gazex > np.min(r_x), gazex < np.max(r_x))
+        cut_r_y = np.logical_and(center_y > np.min(r_y), center_y < np.max(r_y))
+        cut_r_x = np.logical_and(center_x > np.min(r_x), center_x < np.max(r_x))
         cut_r = np.logical_and(cut_r_y, cut_r_x)
 
-        cut_c_y = np.logical_and(gazey > np.min(c_y), gazey < np.max(c_y))
-        cut_c_x = np.logical_and(gazex > np.min(c_x), gazex < np.max(c_x))
+        cut_c_y = np.logical_and(center_y > np.min(c_y), center_y < np.max(c_y))
+        cut_c_x = np.logical_and(center_x > np.min(c_x), center_x < np.max(c_x))
         cut_c = np.logical_and(cut_c_y, cut_c_x)
 
-        cut_f_y = np.logical_and(gazey > np.min(f_y), gazey < np.max(f_y))
-        cut_f_x = np.logical_and(gazex > np.min(f_x), gazex < np.max(f_x))
+        cut_f_y = np.logical_and(center_y > np.min(f_y), center_y < np.max(f_y))
+        cut_f_x = np.logical_and(center_x > np.min(f_x), center_x < np.max(f_x))
         cut_f = np.logical_and(cut_f_y, cut_f_x)
 
-        left = float(gazex[cut_l].size)
-        right = float(gazex[cut_r].size)
-        center = float(gazex[cut_c].size)
-        fixation = float(gazex[cut_f].size)
+        left = float(center_x[cut_l].size)
+        right = float(center_x[cut_r].size)
+        center = float(center_x[cut_c].size)
+        fixation = float(center_x[cut_f].size)
         all_roi = float(center + left + right + fixation)
 
         per_roi = round(all_roi/total, 3) * 100
@@ -447,8 +491,6 @@ class TrackData:
         blink_count = self.blink_count
         blink_rate = round(self.blink_rate, 2)
         
-        fig, ax = plt.subplots()
-        ax.scatter(gazex, gazey, c = time)
         ax.plot(l_x, l_y, c = 'r')
         ax.plot(r_x, r_y, c = 'r')
         ax.plot(c_x, c_y, c = 'r')
@@ -461,6 +503,52 @@ class TrackData:
         ax2.plot(time/1000, pupil)
         fig2.suptitle ('% valid: {}, blink count: {}, blink rate: {}'.format(per_valid, blink_count, blink_rate))
         fig2 = plt.gcf()
+
+        name = name.replace('face1', 'faces_run-01_events.tsv')
+        name = name.replace('face2', 'faces_run-02_events.tsv')
+        subid = name.split('_')
+        subid = subid[0]
+        
+        try:
+            path = os.path.join(bids_dir, subid, 'func', name)
+            event_data = pd.read_csv(path, sep='\t')
+        except:
+            print(path)
+        
+        left_x = []
+        left_y = []
+
+        right_x = []
+        right_y = []
+
+        fig3, ax3 = plt.subplots()
+
+        for index, row in event_data.iterrows():
+            start = row['onset'] * 1000
+            end = start + (row['duration'] * 1000)
+            cut = np.logical_and(time >= start, time <= end)
+            gx = list(gazex[cut])
+            gy = list(gazey[cut])
+
+            if row['correct_response'] == 6:
+                right_x.extend(gx)
+                right_y.extend(gy)
+            elif row['correct_response'] == 1:
+                left_x.extend(gx)
+                left_y.extend(gy)
+
+        ax3.scatter(right_x, right_y, c = 'b')
+        ax3.scatter(left_x, left_y, c = 'y', s = area)
+        ax3.scatter(right_x, right_y, c = 'b', s = area, alpha=.5)
+        ax3.scatter(left_x, left_y, c = 'y', s = area, alpha=.5)
+        ax3.plot(l_x, l_y, c = 'r')
+        ax3.plot(r_x, r_y, c = 'r')
+        ax3.plot(c_x, c_y, c = 'r')
+        ax3.plot(f_x, f_y, c = 'r')
+        ax3.axis([0, res[0], 0, res[1]])
+        fig3.suptitle('% in ROI: {}'.format(per_roi))
+        fig3 = plt.gcf()
+
         
         self.qc_metrics = {'pct_roi_right' : [per_right],
                            'pct_roi_left' : [per_left],
@@ -471,7 +559,7 @@ class TrackData:
                            'blink_count' : [blink_count],
                            'blink_rate' : [blink_rate]}
         
-        self.graphs = (fig, fig2)
+        self.graphs = (fig, fig2, fig3)
         
 
 # In[TrackObject]:
@@ -515,9 +603,9 @@ class TrackObject:
         f.write(outstr)
         f.close()
         
-    def load_from_template(self, infile):
+    def load_from_template(self, infile, bids_dir):
         infile = os.path.abspath(os.path.expanduser(infile))
-        error_folder = infile.split('/'
+        error_folder = infile.split('/')
         error_folder = '/'.join(error_folder[:-2])
         try:
 
@@ -556,8 +644,9 @@ class TrackObject:
                         print('Downsampling: ...')
                         self.run[task] = flipy(self.run[task])
                         self.run[task] = downsample(self.run[task], 800)
-                        self.run[task].qc()
-                    except:
+                        self.run[task], displace = shift_to_center(self.run[task])
+                        self.run[task].qc(bids_dir, self.subid + '_task-' + task, displace)
+                    except: 
                         print('Error loading {}, {}'.format(self.subid, task))
                         f = open(error_folder + '/error_log.txt', 'a')
                         f.write('{} : {} : {} : {}\n'.format(datetime.datetime.now(), 'proc-tracking-coins', self.subid, 'processing error'))
@@ -572,7 +661,7 @@ class TrackObject:
             print('No file: {}'.format(infile))
         
     def parse_asc(self, edffile):
-        cmd = 'edf2asc {}'.format(edffile)
+        cmd = 'edf2asc -y {}'.format(edffile)
         os.system(cmd)
         
         taskfile = edffile.rstrip('.edf')
@@ -676,7 +765,7 @@ class TrackObject:
         
     def save_track_tsv(self, track_data, output_dir):
         tasklist = track_data.tasklist
-        subid = track_data.subid[:9]
+        subid = track_data.subid
         subid2 = track_data.subid
         tsv_name = {}
         tsv_name['face1'] = subid+'_task-faces_run-01_tracking'
@@ -720,12 +809,16 @@ class TrackObject:
                 
                 gaze_plot = graphs[0]
                 pupil_plot = graphs[1]
+                lr_plot = graphs[2]
                 
                 pngpath = os.path.join(output_dir, png_name[task]+'_gaze.png')
                 gaze_plot.savefig(pngpath, dpi=300)
                 
                 pngpath = os.path.join(output_dir, png_name[task]+'_pupil.png')
                 pupil_plot.savefig(pngpath, dpi=300)
+
+                pngpath = os.path.join(output_dir, png_name[task] + '_lrgaze.png')
+                lr_plot.savefig(pngpath, dpi=300)
     
     def save_qc_csv(self, track_data, output_dir):
         tasklist = track_data.tasklist
