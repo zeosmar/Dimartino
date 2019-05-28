@@ -75,7 +75,7 @@ for sub in sublist:
     if not os.path.exists(qa_dir):
         os.makedirs(qa_dir)
     track.plot_qc_graphs(track, qa_dir)
-    track.save_qc_csv(track, qa_dir)
+    track.save_qc_csv(track, project_dir)
     #track.save_track_csv(track, project_dir, sub)
     track.save_track_tsv(track, args.bids_dir)
     print('')

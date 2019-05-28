@@ -823,7 +823,7 @@ class TrackObject:
     def save_qc_csv(self, track_data, output_dir):
         tasklist = track_data.tasklist
         subid = track_data.subid
-        csv_name = subid+'_qc-metrics.csv'
+        csv_name = 'qc-metrics.csv'
         csv_path = os.path.join(output_dir, csv_name)
         
         for task in tasklist:
@@ -845,6 +845,7 @@ class TrackObject:
                            'blink_rate' : []})
                     
                 qc_metrics['task'] = task
+                qc_metrics['subid'] = subid
                 print(qc_metrics)
                 new_df = pd.DataFrame(qc_metrics)
                 
