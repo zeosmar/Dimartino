@@ -823,7 +823,7 @@ class TrackObject:
     def save_qc_csv(self, track_data, output_dir):
         tasklist = track_data.tasklist
         subid = track_data.subid
-        csv_name = 'qc-metrics.csv'
+        csv_name = 'tracking_qc.csv'
         csv_path = os.path.join(output_dir, csv_name)
         
         for task in tasklist:
