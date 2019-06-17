@@ -31,7 +31,7 @@ for i in range(len(subjects)):
         elif len(sub) > 9:
             new_sub = sub[:9]
             
-            path = os.path.joins(args.inputdir, sub)
+            path = os.path.join(args.inputdir, sub)
             
             for (dirpath, dirnames, filenames) in os.walk(path):
                 if 'fmap' not in dirpath:
@@ -44,5 +44,5 @@ for i in range(len(subjects)):
 
             if not os.path.exists(os.path.join(args.inputdir, 'tmp_finalbids')):
                 os.mkdir(os.path.join(args.inputdir, 'tmp_finalbids'))
-            os.rename(path2, os.path.join(args.inputdir, 'tmp_finalbids', i))
+            os.rename(path, os.path.join(args.inputdir, 'tmp_finalbids', subjects[i]))
         
