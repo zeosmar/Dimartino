@@ -334,7 +334,11 @@ for sub in range(1,len(runsheet)):
         physio_bids = physio_bids.append(sub_info, sort=True)
         physio_bids = physio_bids.replace(np.nan, '0')
         physio_bids = physio_bids.reset_index(drop=True)
-    
+
+        for column in ['rest1', 'rest2', 'face1', 'face2']:
+            if column not in list(physio_bids.columns):
+                physio_bids[column] = '0'
+
 physio_bids = physio_bids[['Scan_Subject_ID', 'queried_ursi', 'rest1', 'rest2', 'face1', 'face2']]
 coins_track = physio_bids.copy()
 coins_track = coins_track.drop(labels=['rest1', 'rest2'], axis=1)
@@ -360,6 +364,11 @@ excel.to_csv(tracker_output_file, index=False)
 COINS_BIDS=pd.read_csv(scan_output_file)
  
 COINS_dcm2bids=COINS_BIDS
+
+for column in ['AAHead_scout', 'ABCD_T1w_MPR', 'FMRI_DISTORTION_AP', 'FMRI_DISTORTION_PA', 'REST1', 'FACES1', 'FACES2', 'REST2',
+'ABCD_T2w_SPC', 'SpinEcho_Distortion_AP', 'SpinEcho_Distortion_PA', 'DIFF_137_AP']:
+    if column not in list(COINS_BIDS.columns):
+        COINS_BIDS[column] = '0'
 
 if args.temp_json:
     headk, tailk=os.path.split(args.temp_json)

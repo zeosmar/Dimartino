@@ -69,7 +69,7 @@ path = fullpaths.split('/')
 
 subID=coins_bids['Scan_Subject_ID']
 for i in range(len(subID)):  
-    subid2 = 'sub-' + subID[i]
+    subid2 = 'sub-' + str(subID[i])
     if subid2 in subject_list:
         if os.path.exists(fullpaths + "/sub-"+ str(subID[i]) + "/" + str(subID[i]) + ".json"):
             cmd="dcm2bids -d " + fullpaths + "/sub-" + str(subID[i]) + " -p " + str(subID[i]) + " -c " + fullpaths + "/sub-"+ str(subID[i]) + "/" + str(subID[i]) + ".json" + " -o " + fullpathd

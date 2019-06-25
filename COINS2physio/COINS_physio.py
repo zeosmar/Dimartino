@@ -82,9 +82,9 @@ for index, row in runsheet.iterrows():
         
     for i in list(runsheet.columns):
         subid = row['Scan_Subject_ID']
-        if i[-1].isdigit() and 'sub-' + subid in subject_list:
+        if i[-1].isdigit() and 'sub-' + str(subid) in subject_list:
             if row[i] != '0':
-                json_file[i] = os.path.join(input_dir, 'sub-' +subid, 'originals', '01+physio', 'sub-' +subid+ '_' +row[i]+'.acq')
+                json_file[i] = os.path.join(input_dir, 'sub-' + str(subid), 'originals', '01+physio', 'sub-' +subid+ '_' +row[i]+'.acq')
             else:
                 json_file[i] = ''
 
