@@ -9,6 +9,7 @@ Created on Mon Apr 22 12:51:23 2019
 import os, sys
 import argparse
 import datetime
+import shutil
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -42,7 +43,11 @@ for i in range(len(subjects)):
                             os.makedirs(dirpath.replace(sub, new_sub))
                         os.rename(input_path, final_path)
 
-            if not os.path.exists(os.path.join(args.inputdir, 'tmp_finalbids')):
-                os.mkdir(os.path.join(args.inputdir, 'tmp_finalbids'))
-            os.rename(path, os.path.join(args.inputdir, 'tmp_finalbids', subjects[i]))
-        
+            #if not os.path.exists(os.path.join(args.inputdir, 'tmp_finalbids')):
+                #os.mkdir(os.path.join(args.inputdir, 'tmp_finalbids'))
+            #os.rename(path, os.path.join(args.inputdir, 'tmp_finalbids', subjects[i]))
+
+if os.path.exists(os.path.join(args.inputdir, 'tmp_dcm2bids')):
+    shutil.rmtree(os.path.join(args.inputdir, 'tmp_dcm2bids'))
+if os.path.exists(os.path.join(args.inputdir, 'tmp_finalbids')):
+	shutil.rmtree(os.path.join(args.inputdir, 'tmp_finalbids'))

@@ -718,9 +718,9 @@ def generate_qc(data):
     extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
     
     mycmap = transparent_cmap(cm.jet)
-    plt.imshow(heatmap.T, extent=extent, origin = 'lower', cmap = mycmap)
+    g = plt.imshow(heatmap.T, extent=extent, origin = 'lower', cmap = mycmap)
     
-    per_valid = round(float(data.endsize)/float(data.startsize) * 100, 2)
+    per_valid = round(float(data.endsize)/float(data.startsize), 2)
     blink_count = data.blink_count
     blink_rate = round(data.blink_rate, 2)
     
@@ -730,6 +730,8 @@ def generate_qc(data):
     ax.plot(f_x, f_y, c = 'r')
     ax.axis([0, res[0], 0, res[1]])
     fig.suptitle('% in ROI: {}'.format(per_roi))
+    cb = fig.colorbar(g, ax=ax)
+    cb.set_label('% Fixations in Region')
     fig = plt.gcf()
         
     fig2, ax2 = plt.subplots()
