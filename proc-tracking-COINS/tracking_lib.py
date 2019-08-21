@@ -81,18 +81,6 @@ class TrackObject:
         self.run = {}
         for task in self.task_list:
             self.run[task] = TrackData()
-            
-    def write_to_missing(self, filepath, taskname):
-        logpath = os.path.join(self.project_directory, 'missing_track_runs.csv')
-        if not os.path.exists(logpath):
-            f = open(logpath, 'w')
-            f.write('subject, fmri, date_time, coins_path\n')
-            f.close()
-        datestr = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-        outstr = '{},{},{},{}\n'.format(self.subid, taskname, datestr, filepath)
-        f = open(logpath, 'a')
-        f.write(outstr)
-        f.close()
         
     def load_from_template(self, infile, bids_dir):
         infile = os.path.abspath(os.path.expanduser(infile))
@@ -118,6 +106,7 @@ class TrackObject:
                     self.native_sample_rate = self.run[task].sampling_rate
                     self.run[task] = downsample(self.run[task], 4)
                     try:
+                        self.run[task] = remove_blinks(self.run[task])
                         self.run[task] = trendline_filter(self.run[task])
                     except:
                         print('Error processing - data too noisy, no data remaining after filtering {}, {}'.format(self.subid, task))
@@ -339,8 +328,6 @@ def parse_asc(ascfile):
     data.org_first = (gazex[0], gazey[0], pupil[0])
     data.org_last = (gazex[-1], gazey[-1], pupil[-1])
     
-    data.startsize = len(time)
-    
     data.blink_count = blink_count
     data.blink_rate = blink_count / ((time[-1] / 1000) / 60)
         
@@ -396,6 +383,7 @@ def remove_blinks(data):
     gazey = data.gazey[:]
     pupil = data.pupil[:]
     time = data.time[:]
+    data.startsize = len(time)
     
     blinks = data.blinks[:]
     blinks = np.invert(blinks)
@@ -405,6 +393,7 @@ def remove_blinks(data):
     data.pupil = pupil[blinks]
     data.time = time[blinks]
     
+    data.endsize = len(data.time)
     data = interpolate_data(data)
     
     return data
@@ -474,6 +463,8 @@ def trendline_filter(data):
     gazey = data.gazey[:]
     pupil = data.pupil[:]
     time = data.time[:]
+
+    #data.startsize = len(time)
     
     inter_pupil = pupil[:]
     inter_time = time[:]
@@ -554,8 +545,7 @@ def trendline_filter(data):
     data.gazey = gazey
     data.pupil = pupil
     data.time = time
-    
-    data.endsize = gazex.size
+    #data.endsize = len(time)
     
     data = interpolate_data(data)
     
@@ -603,7 +593,6 @@ def downsample(data, new_ms_sample):
     data.pupil = pupil
     data.org_start = time[0]
     data.org_end = time[-1]
-    data.startsize = time.size
     data.fixs = fixs
     data.saccs = saccs
     data.blinks = blinks
@@ -720,7 +709,7 @@ def generate_qc(data):
     mycmap = transparent_cmap(cm.jet)
     g = plt.imshow(heatmap.T, extent=extent, origin = 'lower', cmap = mycmap)
     
-    per_valid = round(float(data.endsize)/float(data.startsize), 2)
+    per_valid = round(float(data.endsize)/float(data.startsize), 2) * 100
     blink_count = data.blink_count
     blink_rate = round(data.blink_rate, 2)
     

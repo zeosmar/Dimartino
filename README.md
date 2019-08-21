@@ -31,6 +31,11 @@ cmd : dcm2niix edf2asc
 	[/Path/to/Anaconda/Folder]/envs/[name]/bin
 	* where 'Path/to/Anaconda/Folder is the path to the anaconda source folder
 	* where 'name' is the name you gave your environment in step 1
+6) Download DTIPrep from the following link: www.nitrc.org/projects/dtiprep. Select the version appropriate for the system. 
+7) Move contents of downloaded DTIPrep files (unzipped) to the following directory:
+	[/Path/to/Anaconda/Folder]/envs/[name]/bin
+	* where 'Path/to/Anaconda/Folder' is the path to the anaconda source folder
+	* where 'name' is the name you gave your environment in step 1
 
 # Script Instructions
 
@@ -171,6 +176,21 @@ cmd : dcm2niix edf2asc
   * output
     * project_directory/[subid]/QC/eyetracking - folder containing QC info and images for eye tracking data
     * bids_dir/[subid]/func/[].tsv - .tsv file with time series for eye tracking data
+
+10) proc-DWI-COINS/proc-DWI-COINS.py : processes and QCs DTI scans
+  * arguments
+	* --source_dir /Path/to/source/directory
+	* --subject_list /Path/to/list/of/subjects/to/run
+	* --protocol_template /Path/to/DTI-template.xml (proc-DWI-COINS/DTI-template.xml)
+	* --COINS_BIDS /Path/to/selected_scans.csv (step 1 output)
+	* --bids_dir /Path/to/BIDS/directory
+  * needed for input
+	* folder with dicom data
+	* list of subjects to process (.txt file, formatted 'sub-80084', one subject per line)
+	* protocol template for DTIPrep - downloaded from github
+	* selected_scans.csv (step 1 output)
+	* a nifti version of the dti data in each subject's bids folder
+	* bids formatted destination folder (should be same as given in steps 2, 4, and 9)
 
 10) final-bids/finalize_bids.py : combines runs from same subject into single file
   --bids_dir /Path/to/bids/directory
