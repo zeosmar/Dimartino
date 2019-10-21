@@ -43,9 +43,9 @@ for i in range(len(subjects)):
                             os.makedirs(dirpath.replace(sub, new_sub))
                         os.rename(input_path, final_path)
 
-            #if not os.path.exists(os.path.join(args.inputdir, 'tmp_finalbids')):
-                #os.mkdir(os.path.join(args.inputdir, 'tmp_finalbids'))
-            #os.rename(path, os.path.join(args.inputdir, 'tmp_finalbids', subjects[i]))
+            if not os.path.exists(os.path.join(args.inputdir, 'tmp_finalbids')):
+                os.mkdir(os.path.join(args.inputdir, 'tmp_finalbids'))
+            os.rename(path, os.path.join(args.inputdir, 'tmp_finalbids', subjects[i]))
 
 if os.path.exists(os.path.join(args.inputdir, 'tmp_dcm2bids')):
     shutil.rmtree(os.path.join(args.inputdir, 'tmp_dcm2bids'))

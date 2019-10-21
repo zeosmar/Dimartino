@@ -15,6 +15,7 @@ Created on Sat Apr 21 10:05:12 2018
 import bioread as br
 import numpy as np
 import scipy.signal as signal
+import scipy.stats
 import os.path as path
 import json
 import os
@@ -29,6 +30,18 @@ def moving_average(a, n=3) :
     ret[n:] = ret[n:] - ret[:-n]
     return ret[n - 1:] / n
 
+def distance_btw_peaks(time, hr_idx):
+    distances = []
+    n = 0
+    for i in range(len(hr_idx)):
+        if i == 0:
+            n = time[hr_idx[i]]
+        else:
+            n2 = time[hr_idx[i]]
+            distances.append(n2 - n)
+    distances = np.array(distances)
+    return distances
+
 class PhysData():
     def __init__(self):
         self.pulse = np.nan
@@ -37,6 +50,10 @@ class PhysData():
         self.rr = np.nan 
         self.hr_idx = np.nan
         self.rr_idx = np.nan
+        self.rr_skew = np.nan
+        self.rr_kurtosis = np.nan
+        self.hr_skew = np.nan
+        self.hr_kurtosis = np.nan
         self.name = ""
 
 class PhysioObject():
@@ -120,6 +137,16 @@ class PhysioObject():
                         self.run[task].hr = int(len(self.run[task].hr_idx) / ((len(self.run[task].pulse)/self.target_sampling_rate)/60.0))
                         self.run[task].rr_idx = signal.find_peaks_cwt(moving_average(self.run[task].resp,50), np.arange(1,70))
                         self.run[task].rr = int(len(self.run[task].rr_idx) / ((len(self.run[task].resp)/self.target_sampling_rate)/60.0))
+
+                        time = np.arange(0, len(self.run[task].pulse) * self.target_sampling_rate, self.target_sampling_rate)
+                        
+                        hr_distances = distance_btw_peaks(time, self.run[task].hr_idx)
+                        rr_distances = distance_btw_peaks(time, self.run[task].rr_idx)
+
+                        self.run[task].hr_skew = scipy.stats.skew(hr_distances)
+                        self.run[task].hr_kurtosis = scipy.stats.kurtosis(hr_distances)
+                        self.run[task].rr_skew = scipy.stats.skew(rr_distances)
+                        self.run[task].rr_kurtosis = scipy.stats.kurtosis(rr_distances)
                     except IOError:
                         print('Error processing {}, {}'.format(self.subid, task))
                         f = open(error_folder + '/error_log.txt', 'a')
@@ -204,6 +231,10 @@ def save_physio_csv(physio_data, output_dir):
     for task in physio_data.tasklist:
         odat[task+'_hr'] = physio_data.run[task].hr
         odat[task+'_rr'] = physio_data.run[task].rr
+        odat[task+'_rr_skew'] = physio_data.run[task].rr_skew
+        odat[task+'_rr_kurtosis'] = physio_data.run[task].rr_kurtosis
+        odat[task+'_hr_skew'] = physio_data.run[task].hr_skew
+        odat[task+'_hr_kurtosis'] = physio_data.run[task].hr_kurtosis
     df = pd.DataFrame([odat])
     if os.path.isfile(output_csv) is True:
         indf = pd.read_csv(output_csv)
